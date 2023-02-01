@@ -1,0 +1,216 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  TECHNICIAN
+  ADMIN
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email String @unique
+  hash String
+  role Role @default(USER)
+
+  phone Int?
+  firstName String?
+  lastName String?
+
+  technician Technician?
+
+  profile Profile? 
+
+  @@map("users")
+}
+
+model Technician {
+  id Int @id @default(autoincrement())
+
+  basic BasicProfile?
+  degrees Degree[]
+  services Service[]
+  languages Language[]
+  location Location?
+  portfolio Portfolio[]
+  socialNetworks TechnicianSocialNetwork[]
+
+  categories CategoriesOnTechnicians[]
+
+  userId Int @unique 
+  user User @relation(fields: [userId], references: [id])
+
+  userFavorites UserFavorites[]
+  userContact UserContacts[]
+
+
+  @@map("technicians")
+}
+
+model Profile {
+  id Int @id @default(autoincrement())
+
+  technicianFavorites UserFavorites[]
+  technicianContact UserContacts[]
+
+  userId Int @unique
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("profiles")
+}
+
+model BasicProfile {
+  id Int @id @default(autoincrement())
+  name String?
+  description String?
+  status String?
+  id_status String?
+  bgPhoto String?
+  picture String?
+
+  tecId Int @unique
+  technician Technician @relation(fields: [tecId], references: [id])
+
+  @@map("profile_technicians")
+}
+
+model Degree {
+  id Int @id @default(autoincrement())
+  field String
+  academicDegree String
+  start DateTime
+  end String
+  school String
+
+  tecId Int
+  technician Technician @relation(fields: [tecId], references: [id])
+  @@map("degrees")
+}
+
+model Service {
+  id Int @id @default(autoincrement())
+  title String
+  price Int
+  description String
+
+  tecId Int
+  technician Technician @relation(fields: [tecId], references: [id])
+  @@map("services")
+}
+
+model Language {
+  id Int @id @default(autoincrement())
+  language String
+  id_language String
+
+  proficiency String
+  id_proficiency String
+
+  tecId Int
+  technician Technician @relation(fields: [tecId], references: [id])
+  @@map("languages")
+}
+
+model Location {
+  id Int @id @default(autoincrement())
+  location String
+  coordinates String
+
+  tecId Int @unique
+  technician Technician @relation(fields: [tecId], references: [id])
+  @@map("locations")
+}
+
+model Portfolio {
+  id Int @id @default(autoincrement())
+  image String
+  cite String
+
+  tecId Int @unique
+  technician Technician @relation(fields: [tecId], references: [id])
+  @@map("portfolios")
+}
+
+model TechnicianSocialNetwork {
+  id Int @id @default(autoincrement())
+  name String
+
+  tecId Int @unique
+  technician Technician @relation(fields: [tecId], references: [id])
+  @@map("technician_social_networks")
+}
+
+//  ****  Profile User  *****
+
+
+model UserFavorites {
+  profileId Int @unique
+  profile Profile @relation(fields: [profileId], references: [id])
+
+  tecId Int @unique
+  technician Technician @relation(fields: [tecId], references: [id])
+
+  assignedAt DateTime @default(now())
+
+  @@id([profileId, tecId])
+}
+
+model UserContacts {
+  profileId Int @unique
+  profile Profile @relation(fields: [profileId], references: [id])
+
+  tecId Int @unique
+  technician Technician @relation(fields: [tecId], references: [id])
+
+  assignedAt DateTime @default(now())
+
+  @@id([profileId, tecId])
+}
+
+
+// **** Category ******
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String
+
+  technicias CategoriesOnTechnicians[]
+
+  @@map("categories")
+}
+
+
+model CategoriesOnTechnicians {
+  categoryId Int @unique
+  category Category @relation(fields: [categoryId], references: [id])
+
+  tecId Int @unique
+  technician Technician @relation(fields: [tecId], references: [id])
+
+  assignedAt DateTime @default(now())
+
+  @@id([categoryId, tecId])
+}
+
+
+//  ***** list Social Networks  ***** 
+
+model SocialNetwork {
+  id Int @id @default(autoincrement())
+  name String
+
+  @@map("social_networks")
+}
+
