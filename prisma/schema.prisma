@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,207 +7,197 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  TECHNICIAN
-  ADMIN
-}
-
 model User {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  email String @unique
-  hash String
-  role Role @default(USER)
-
-  phone Int?
-  firstName String?
-  lastName String?
-
-  technician Technician?
-
-  profile Profile? 
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  email      String   @unique
+  hash       String
+  role       Role     @default(USER)
+  phone      Int?
+  first_name String?
+  last_name  String?
+  expert     Expert?
+  profile    Profile?
 
   @@map("users")
 }
 
-model Technician {
-  id Int @id @default(autoincrement())
+model Expert {
+  id                Int                        @id @default(autoincrement())
+  user_id           Int                        @unique
+  user_contact      UserContacts?
+  user_favorites    UserFavorites?
+  basic             BasicProfile?
+  categories_degree CategoriesDegreeOnExperts?
+  categories        CategoriesOnExperts?
+  degrees           Degree[]
+  social_networks   ExpertSocialNetwork?
+  user              User                       @relation(fields: [user_id], references: [id])
+  languages         Language[]
+  location          Location?
+  portfolio         Portfolio?
+  services          Service[]
 
-  basic BasicProfile?
-  degrees Degree[]
-  services Service[]
-  languages Language[]
-  location Location?
-  portfolio Portfolio[]
-  socialNetworks TechnicianSocialNetwork[]
-
-  categories CategoriesOnTechnicians[]
-
-  userId Int @unique 
-  user User @relation(fields: [userId], references: [id])
-
-  userFavorites UserFavorites[]
-  userContact UserContacts[]
-
-
-  @@map("technicians")
+  @@map("experts")
 }
 
 model Profile {
-  id Int @id @default(autoincrement())
-
-  technicianFavorites UserFavorites[]
-  technicianContact UserContacts[]
-
-  userId Int @unique
-  user User? @relation(fields: [userId], references: [id])
+  id               Int            @id @default(autoincrement())
+  user_id          Int            @unique
+  expert_contact   UserContacts?
+  expert_favorites UserFavorites?
+  user             User           @relation(fields: [user_id], references: [id])
 
   @@map("profiles")
 }
 
 model BasicProfile {
-  id Int @id @default(autoincrement())
-  name String?
+  id          Int     @id @default(autoincrement())
+  name        String?
   description String?
-  status String?
-  id_status String?
-  bgPhoto String?
-  picture String?
+  status      String?
+  id_status   String?
+  bgPhoto     String?
+  picture     String?
+  exp_id      Int     @unique
+  expert      Expert  @relation(fields: [exp_id], references: [id])
 
-  tecId Int @unique
-  technician Technician @relation(fields: [tecId], references: [id])
-
-  @@map("profile_technicians")
+  @@map("basic_profiles")
 }
 
 model Degree {
-  id Int @id @default(autoincrement())
-  field String
-  academicDegree String
-  start DateTime
-  end String
-  school String
+  id              Int      @id @default(autoincrement())
+  field           String
+  academic_degree String
+  start           DateTime
+  end             String
+  school          String
+  exp_id          Int
+  expert          Expert   @relation(fields: [exp_id], references: [id])
 
-  tecId Int
-  technician Technician @relation(fields: [tecId], references: [id])
   @@map("degrees")
 }
 
 model Service {
-  id Int @id @default(autoincrement())
-  title String
-  price Int
+  id          Int    @id @default(autoincrement())
+  title       String
+  price       Int
   description String
+  exp_id      Int
+  expert      Expert @relation(fields: [exp_id], references: [id])
 
-  tecId Int
-  technician Technician @relation(fields: [tecId], references: [id])
   @@map("services")
 }
 
 model Language {
-  id Int @id @default(autoincrement())
-  language String
-  id_language String
-
-  proficiency String
+  id             Int    @id @default(autoincrement())
+  language       String
+  id_language    String
+  proficiency    String
   id_proficiency String
+  exp_id         Int
+  expert         Expert @relation(fields: [exp_id], references: [id])
 
-  tecId Int
-  technician Technician @relation(fields: [tecId], references: [id])
   @@map("languages")
 }
 
 model Location {
-  id Int @id @default(autoincrement())
-  location String
+  id          Int    @id @default(autoincrement())
+  location    String
   coordinates String
+  exp_id      Int    @unique
+  expert      Expert @relation(fields: [exp_id], references: [id])
 
-  tecId Int @unique
-  technician Technician @relation(fields: [tecId], references: [id])
   @@map("locations")
 }
 
 model Portfolio {
-  id Int @id @default(autoincrement())
-  image String
-  cite String
+  id     Int    @id @default(autoincrement())
+  image  String
+  cite   String
+  exp_id Int    @unique
+  expert Expert @relation(fields: [exp_id], references: [id])
 
-  tecId Int @unique
-  technician Technician @relation(fields: [tecId], references: [id])
   @@map("portfolios")
 }
 
-model TechnicianSocialNetwork {
-  id Int @id @default(autoincrement())
-  name String
+model ExpertSocialNetwork {
+  id     Int    @id @default(autoincrement())
+  name   String
+  exp_id Int    @unique
+  expert Expert @relation(fields: [exp_id], references: [id])
 
-  tecId Int @unique
-  technician Technician @relation(fields: [tecId], references: [id])
-  @@map("technician_social_networks")
+  @@map("expert_social_networks")
 }
 
-//  ****  Profile User  *****
-
-
 model UserFavorites {
-  profileId Int @unique
-  profile Profile @relation(fields: [profileId], references: [id])
-
-  tecId Int @unique
-  technician Technician @relation(fields: [tecId], references: [id])
-
+  profile_id Int      @unique
+  exp_id     Int      @unique
   assignedAt DateTime @default(now())
+  expert     Expert   @relation(fields: [exp_id], references: [id])
+  profile    Profile  @relation(fields: [profile_id], references: [id])
 
-  @@id([profileId, tecId])
+  @@id([profile_id, exp_id])
 }
 
 model UserContacts {
-  profileId Int @unique
-  profile Profile @relation(fields: [profileId], references: [id])
-
-  tecId Int @unique
-  technician Technician @relation(fields: [tecId], references: [id])
-
+  profile_id Int      @unique
+  exp_id     Int      @unique
   assignedAt DateTime @default(now())
+  expert     Expert   @relation(fields: [exp_id], references: [id])
+  profile    Profile  @relation(fields: [profile_id], references: [id])
 
-  @@id([profileId, tecId])
+  @@id([profile_id, exp_id])
 }
 
-
-// **** Category ******
-
 model Category {
-  id Int @id @default(autoincrement())
-  name String
-
-  technicias CategoriesOnTechnicians[]
+  id     Int                  @id @default(autoincrement())
+  name   String
+  expert CategoriesOnExperts?
 
   @@map("categories")
 }
 
+model CategoriesOnExperts {
+  category_id Int      @unique
+  exp_id      Int      @unique
+  assignedAt  DateTime @default(now())
+  category    Category @relation(fields: [category_id], references: [id])
+  expert      Expert   @relation(fields: [exp_id], references: [id])
 
-model CategoriesOnTechnicians {
-  categoryId Int @unique
-  category Category @relation(fields: [categoryId], references: [id])
-
-  tecId Int @unique
-  technician Technician @relation(fields: [tecId], references: [id])
-
-  assignedAt DateTime @default(now())
-
-  @@id([categoryId, tecId])
+  @@id([category_id, exp_id])
+  @@map("categories_on_experts")
 }
 
+model CategoryDegrees {
+  id     Int                        @id @default(autoincrement())
+  name   String
+  expert CategoriesDegreeOnExperts?
 
-//  ***** list Social Networks  ***** 
+  @@map("categories_degree")
+}
+
+model CategoriesDegreeOnExperts {
+  category_id Int             @unique
+  exp_id      Int             @unique
+  assignedAt  DateTime        @default(now())
+  category    CategoryDegrees @relation(fields: [category_id], references: [id])
+  expert      Expert          @relation(fields: [exp_id], references: [id])
+
+  @@id([category_id, exp_id])
+  @@map("categories_degree_on_experts")
+}
 
 model SocialNetwork {
-  id Int @id @default(autoincrement())
+  id   Int    @id @default(autoincrement())
   name String
 
   @@map("social_networks")
 }
 
+enum Role {
+  USER
+  EXPERT
+  ADMIN
+}

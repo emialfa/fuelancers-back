@@ -1,9 +1,26 @@
 import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { GetUser } from './decorators';
-import { JwtGuard } from 'src/auth/guard';
+import { JwtGuard } from '../auth/guard';
 import { UserService } from './user.service';
 import { UpdateUser } from './dto';
+
+enum Role {
+  USER,
+  TECHNICIAN,
+  ADMIN,
+}
+
+type User = {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  email: string;
+  hash: string;
+  role: Role;
+  phone: number | null;
+  firstName: string | null;
+  lastName: string | null;
+};
 
 @UseGuards(JwtGuard)
 @Controller('api/v1/users')

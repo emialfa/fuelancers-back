@@ -1,0 +1,67 @@
+service: thricos-backend
+useDotenv: true
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  environment:
+    TOKEN_KEY: asdl/12#dqz-dqwd
+    DATABASE_URL: postgresql://admin_thricos:Kunkka_1610@thricos-marketplace-database.c423ehsvjvmb.eu-west-1.rds.amazonaws.com:5432/postgres?connection_timeout=500&sslmode=disable
+    CLIENT_ID: 1053079554666-265tipmhgv7oqf5kg24mgonn65ujrbi0.apps.googleusercontent.com
+    CLIENT_SECRET: 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
+    CALLBACK_URL: http://localhost:8080/api/v1/auth/google/callback
+  region: eu-west-1
+
+  s3:
+    # Eventual additional properties in camel case
+    bucketOne:
+      # Supported properties are the same ones as supported by CF resource for S3 bucket
+      name: my-custom-bucket-name
+      versioningConfiguration:
+        Status: Enabled
+  # stage: dev
+package:
+  excludeDevDependencies: true
+  exclude:
+    - test/**
+    - src/**
+    - .dockerignore
+    - .eslintrc.js
+    - .prettierrc
+    - nest-cli.json
+    - README.md
+    - .tsconfig.json
+    - .tsconfig.build.json
+    - .git/**
+    - .vscode/**
+    - venv/**
+    - node_modules/**
+    - custom-node-modules/**
+
+  include:
+    - dist/**
+    - prisma/**
+
+functions:
+  main:
+    handler: dist/serverless.handler
+    layers:
+      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:4
+      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:3
+    events:
+      - http:
+          method: ANY
+          path: /
+          cors: true
+      - http:
+          method: ANY
+          path: '{proxy+}'
+          cors: true
+
+custom:
+  serverless-offline:
+    noPrependStageInUrl: true
+    httpPort: 4000

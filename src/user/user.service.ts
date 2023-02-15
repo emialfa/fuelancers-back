@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUser } from './dto';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class UserService {
 
     const profile = await this.prisma.profile.findUnique({
       where: {
-        userId: parseInt(id),
+        user_id: parseInt(id),
       },
     });
 
@@ -46,7 +46,7 @@ export class UserService {
     // delete user profile
     await this.prisma.profile.delete({
       where: {
-        userId: parseInt(id),
+        user_id: parseInt(id),
       },
     });
 

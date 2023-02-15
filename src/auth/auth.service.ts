@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { SignIn, SignUp, AuthGoogle } from './dto';
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -44,8 +44,8 @@ export class AuthService {
         data: {
           email: dto.email,
           hash,
-          firstName: dto.firstName,
-          lastName: dto.lastName,
+          first_name: dto.first_name,
+          last_name: dto.last_name,
           phone: dto.phone,
           profile: {
             create: {},
@@ -76,14 +76,14 @@ export class AuthService {
         data: {
           email: dto.email,
           hash,
-          firstName: dto.firstName,
-          lastName: dto.lastName,
+          first_name: dto.first_name,
+          last_name: dto.last_name,
           phone: dto.phone,
-          role: 'TECHNICIAN',
+          role: 'EXPERT',
           profile: {
             create: {},
           },
-          technician: {
+          expert: {
             create: {},
           },
         },
@@ -132,7 +132,7 @@ export class AuthService {
       expiresIn: expiresIn,
       secret,
     });
-    console.log(token);
+
     return {
       access_token: token,
     };
@@ -152,8 +152,8 @@ export class AuthService {
         data: {
           email: dto.email,
           hash: '',
-          firstName: dto.firstName,
-          lastName: dto.lastName,
+          first_name: dto.firstName,
+          last_name: dto.lastName,
           phone: 0,
           profile: {
             create: {},

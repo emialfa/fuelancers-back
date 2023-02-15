@@ -7,7 +7,7 @@ export class DTODegrees {
 
   @IsString()
   @IsOptional()
-  academicDegree: string;
+  academic_degree: string;
 
   @IsDateString()
   @IsOptional()

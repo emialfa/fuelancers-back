@@ -1,17 +1,17 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { ResponseOK } from 'src/common/responses/responses';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { ResponseOK } from '../common/responses/responses';
+import { PrismaService } from '../prisma/prisma.service';
 import { DTOBasicData, DTODegrees, DTOLanguages, DTOServices } from './dto';
 
 @Injectable()
-export class TechnicianService {
+export class ExpertService {
   constructor(private prisma: PrismaService) {}
 
   // services
-  async getTechnician(id: string) {
-    const technician = await this.prisma.technician.findUnique({
+  async getExpert(id: string) {
+    const expert = await this.prisma.expert.findUnique({
       where: {
-        userId: parseInt(id),
+        user_id: parseInt(id),
       },
       select: {
         basic: {},
@@ -19,20 +19,20 @@ export class TechnicianService {
       },
     });
 
-    if (!technician) throw new ForbiddenException("The technician's profile has not been found");
+    if (!expert) throw new ForbiddenException("The expert's profile has not been found");
 
-    return technician;
+    return expert;
   }
 
   // Services Basic data
 
-  async createBasicData(idTec: string, dto: DTOBasicData) {
+  async createBasicData(idExp: string, dto: DTOBasicData) {
     try {
       await this.prisma.basicProfile.create({
         data: {
           ...dto,
-          technician: {
-            connect: { id: parseInt(idTec) },
+          expert: {
+            connect: { id: parseInt(idExp) },
           },
         },
       });
@@ -43,11 +43,11 @@ export class TechnicianService {
     }
   }
 
-  async updateBasicData(idTec: string, dto: DTOBasicData) {
+  async updateBasicData(idExp: string, dto: DTOBasicData) {
     try {
-      await this.prisma.technician.update({
+      await this.prisma.expert.update({
         where: {
-          id: parseInt(idTec),
+          id: parseInt(idExp),
         },
         data: {
           basic: {
@@ -66,13 +66,13 @@ export class TechnicianService {
 
   // services to degreess
 
-  async createDegree(idTec: string, dto: DTODegrees) {
+  async createDegree(idExp: string, dto: DTODegrees) {
     try {
       await this.prisma.degree.create({
         data: {
           ...dto,
-          technician: {
-            connect: { id: parseInt(idTec) },
+          expert: {
+            connect: { id: parseInt(idExp) },
           },
         },
       });
@@ -83,13 +83,13 @@ export class TechnicianService {
     }
   }
 
-  async updateDegree(idTec: string, idDegree: string, dto: DTODegrees) {
+  async updateDegree(idExp: string, idDegree: string, dto: DTODegrees) {
     try {
       await this.getDegreeByID(idDegree);
 
-      await this.prisma.technician.update({
+      await this.prisma.expert.update({
         where: {
-          id: parseInt(idTec),
+          id: parseInt(idExp),
         },
         data: {
           degrees: {
@@ -111,13 +111,13 @@ export class TechnicianService {
     }
   }
 
-  async deleteDegree(idTec: string, idDegree: string) {
+  async deleteDegree(idExp: string, idDegree: string) {
     try {
       await this.getDegreeByID(idDegree);
 
-      await this.prisma.technician.update({
+      await this.prisma.expert.update({
         where: {
-          id: parseInt(idTec),
+          id: parseInt(idExp),
         },
         data: {
           degrees: {
@@ -146,13 +146,13 @@ export class TechnicianService {
 
   // services
 
-  async createService(idTec: string, dto: DTOServices) {
+  async createService(idExp: string, dto: DTOServices) {
     try {
       await this.prisma.service.create({
         data: {
           ...dto,
-          technician: {
-            connect: { id: parseInt(idTec) },
+          expert: {
+            connect: { id: parseInt(idExp) },
           },
         },
       });
@@ -163,13 +163,13 @@ export class TechnicianService {
     }
   }
 
-  async updateService(idTec: string, idService: string, dto: DTOServices) {
+  async updateService(idExp: string, idService: string, dto: DTOServices) {
     try {
       await this.getServiceByID(idService);
 
-      await this.prisma.technician.update({
+      await this.prisma.expert.update({
         where: {
-          id: parseInt(idTec),
+          id: parseInt(idExp),
         },
         data: {
           services: {
@@ -191,13 +191,13 @@ export class TechnicianService {
     }
   }
 
-  async deleteService(idTec: string, idService: string) {
+  async deleteService(idExp: string, idService: string) {
     try {
       await this.getServiceByID(idService);
 
-      await this.prisma.technician.update({
+      await this.prisma.expert.update({
         where: {
-          id: parseInt(idTec),
+          id: parseInt(idExp),
         },
         data: {
           services: {
@@ -225,13 +225,13 @@ export class TechnicianService {
   }
 
   // languages
-  async createLanguage(idTec: string, dto: DTOLanguages) {
+  async createLanguage(idExp: string, dto: DTOLanguages) {
     try {
       await this.prisma.language.create({
         data: {
           ...dto,
-          technician: {
-            connect: { id: parseInt(idTec) },
+          expert: {
+            connect: { id: parseInt(idExp) },
           },
         },
       });
@@ -242,13 +242,13 @@ export class TechnicianService {
     }
   }
 
-  async updateLanguage(idTec: string, idLanguage: string, dto: DTOLanguages) {
+  async updateLanguage(idExp: string, idLanguage: string, dto: DTOLanguages) {
     try {
       await this.getLanguageByID(idLanguage);
 
-      await this.prisma.technician.update({
+      await this.prisma.expert.update({
         where: {
-          id: parseInt(idTec),
+          id: parseInt(idExp),
         },
         data: {
           languages: {
@@ -270,13 +270,13 @@ export class TechnicianService {
     }
   }
 
-  async deleteLanguage(idTec: string, idLanguage: string) {
+  async deleteLanguage(idExp: string, idLanguage: string) {
     try {
       await this.getLanguageByID(idLanguage);
 
-      await this.prisma.technician.update({
+      await this.prisma.expert.update({
         where: {
-          id: parseInt(idTec),
+          id: parseInt(idExp),
         },
         data: {
           languages: {

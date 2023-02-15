@@ -4,10 +4,11 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
-import { TechnicianModule } from './technician/technician.module';
+import { ExpertModule } from './expert/expert.module';
+import { GenericsModule } from './generics/generics.module';
 // middleware technician
-import { CheckerTechnicianMiddleware } from './common/middlewares/checkerTechnician.middleware';
-import { TechnicianController } from './technician/technician.controller';
+import { CheckerExpertMiddleware } from './common/middlewares/checkerExpert.middleware';
+import { ExpertController } from './expert/expert.controller';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { TechnicianController } from './technician/technician.controller';
     AuthModule,
     PrismaModule,
     UserModule,
-    TechnicianModule,
+    ExpertModule,
+    GenericsModule,
   ],
   controllers: [],
   providers: [],
@@ -23,8 +25,8 @@ import { TechnicianController } from './technician/technician.controller';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(CheckerTechnicianMiddleware)
+      .apply(CheckerExpertMiddleware)
       .exclude({ path: 'api/v1/technician/:id', method: RequestMethod.GET })
-      .forRoutes(TechnicianController);
+      .forRoutes(ExpertController);
   }
 }
