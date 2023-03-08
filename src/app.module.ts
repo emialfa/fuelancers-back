@@ -24,9 +24,12 @@ import { ExpertController } from './expert/expert.controller';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(CheckerExpertMiddleware)
-      .exclude({ path: 'api/v1/technician/:id', method: RequestMethod.GET })
-      .forRoutes(ExpertController);
+    // consumer
+    //   .apply(CheckerExpertMiddleware)
+    //   .exclude(
+    //     { path: '/api/v1/experts/:id', method: RequestMethod.GET },
+    //     { path: '/api/v1/experts/*', method: RequestMethod.GET },
+    //   )
+    //   .forRoutes(ExpertController);
   }
 }

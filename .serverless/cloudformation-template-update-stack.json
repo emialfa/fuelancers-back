@@ -161,13 +161,13 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/thricos-backend/prod/1675795441803-2023-02-07T18:44:01.803Z/thricos-backend.zip"
+          "S3Key": "serverless/thricos-backend/prod/1677210398435-2023-02-24T03:46:38.435Z/thricos-backend.zip"
         },
         "Handler": "dist/serverless.handler",
         "Runtime": "nodejs16.x",
         "FunctionName": "thricos-backend-prod-main",
         "MemorySize": 1024,
-        "Timeout": 6,
+        "Timeout": 20,
         "Environment": {
           "Variables": {
             "TOKEN_KEY": "asdl/12#dqz-dqwd",
@@ -184,22 +184,22 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:4",
-          "arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:3"
+          "arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:5",
+          "arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:4"
         ]
       },
       "DependsOn": [
         "MainLogGroup"
       ]
     },
-    "MainLambdaVersion9PTEMwRnvY7J4u6U3l5DEHQh6hWVP7vxPKtzZyKo": {
+    "MainLambdaVersionDh9HnkVINS5rzYv2QH4AuDdWID2J9aFHdA7r4zdE": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "MainLambdaFunction"
         },
-        "CodeSha256": "LfFTmWKHXpE7nrDPA66AjTpR2DzROGruvSWRV0pdkak="
+        "CodeSha256": "xwjyOlmJS+GN+u7lWAp3E9VlpEzSFSn9CoR5w42AXPc="
       }
     },
     "ApiGatewayRestApi": {
@@ -257,7 +257,7 @@
               "StatusCode": "200",
               "ResponseParameters": {
                 "method.response.header.Access-Control-Allow-Origin": "'*'",
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
                 "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
               },
               "ResponseTemplates": {
@@ -305,7 +305,7 @@
               "StatusCode": "200",
               "ResponseParameters": {
                 "method.response.header.Access-Control-Allow-Origin": "'*'",
-                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,X-Amzn-Trace-Id'",
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
                 "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'"
               },
               "ResponseTemplates": {
@@ -417,7 +417,7 @@
         "MainLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1675795415079": {
+    "ApiGatewayDeployment1677210375954": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -482,7 +482,7 @@
     "MainLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "MainLambdaVersion9PTEMwRnvY7J4u6U3l5DEHQh6hWVP7vxPKtzZyKo"
+        "Ref": "MainLambdaVersionDh9HnkVINS5rzYv2QH4AuDdWID2J9aFHdA7r4zdE"
       },
       "Export": {
         "Name": "sls-thricos-backend-prod-MainLambdaFunctionQualifiedArn"

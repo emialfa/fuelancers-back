@@ -2,7 +2,7 @@
 /dist
 /node_modules
 /custom-node-modules
-
+/.serverless
 # Logs
 logs
 *.log

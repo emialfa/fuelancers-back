@@ -1,4 +1,6 @@
-export function ResponseOK(message: string, code = 200) {
+import { HttpException } from '@nestjs/common';
+
+export function ResponseOK(message: string, code = 201) {
   return {
     success: true,
     message: message,
@@ -6,10 +8,19 @@ export function ResponseOK(message: string, code = 200) {
   };
 }
 
-export function ResponseError(message: string, code = 404) {
+export function ResponseGet<T>(data: T, code = 200, success = true) {
   return {
-    error: true,
-    message: message,
+    success: success,
+    data: data,
     code: code,
   };
+}
+
+export function ResponseError(error: any, code = 404) {
+  const jsonError = {
+    success: false,
+    error: error,
+    code: code,
+  };
+  throw new HttpException(jsonError, code);
 }

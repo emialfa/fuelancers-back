@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignIn, SignUp } from './dto';
+import { SignIn, DTOSignUp } from './dto';
 import { GoogleOauthGuard } from './guard';
 
 @Controller('api/v1/auth')
@@ -14,12 +14,12 @@ export class AuthController {
   }
 
   @Post('signup')
-  signup(@Body() dto: SignUp) {
+  signup(@Body() dto: DTOSignUp) {
     return this.authService.signUp(dto);
   }
 
   @Post('signup-as-technician')
-  signupAsTechnician(@Body() dto: SignUp) {
+  signupAsTechnician(@Body() dto: DTOSignUp) {
     return this.authService.signUpAsTechnician(dto);
   }
 

@@ -11,7 +11,7 @@ export class CheckerExpertMiddleware implements NestMiddleware {
     const idExp = req.params.id_exp;
 
     // execute function to check if the expert exists
-    const checker = await this.checkExistExist(idExp);
+    const checker = await this.checkExistExpert(idExp);
     if (!checker) return;
 
     // if exist continue process
@@ -28,7 +28,7 @@ export class CheckerExpertMiddleware implements NestMiddleware {
     return expert;
   }
 
-  async checkExistExist(idExp: string) {
+  async checkExistExpert(idExp: string) {
     const existExpert = await this.getExpertByID(idExp);
 
     if (!existExpert) throw new ForbiddenException('Invalid expert ID ');

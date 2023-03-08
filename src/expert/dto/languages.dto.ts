@@ -1,15 +1,9 @@
-import { IsString } from 'class-validator';
+import { IsNumber } from 'class-validator';
 
 export class DTOLanguages {
-  @IsString()
-  language: string;
+  @IsNumber()
+  id_language: number;
 
-  @IsString()
-  id_language: string;
-
-  @IsString()
-  proficiency: string;
-
-  @IsString()
-  id_proficiency: string;
+  @IsNumber()
+  id_proficiency: number;
 }

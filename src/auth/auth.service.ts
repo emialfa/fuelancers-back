@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { SignIn, SignUp, AuthGoogle } from './dto';
+import { SignIn, DTOSignUp, AuthGoogle } from './dto';
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
@@ -15,26 +15,30 @@ export class AuthService {
   ) {}
 
   async signIn(dto: SignIn) {
-    // find the user by email
-    const user = await this.findUser(dto.email);
+    try {
+      // find the user by email
+      const user = await this.findUser(dto.email);
 
-    // if the user does not exist throw error
-    if (!user) throw new ForbiddenException('Credentials incorrect');
+      // if the user does not exist throw error
+      if (!user) throw new ForbiddenException('Credentials incorrect');
 
-    // compare password
-    const pwMatches = await argon.verify(user.hash, dto.password);
+      // compare password
+      const pwMatches = await argon.verify(user.hash, dto.password);
 
-    // invalid password
-    if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+      // invalid password
+      if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
 
-    // return user
-    delete user.hash;
+      // return user
+      delete user.hash;
 
-    // return token generated
-    return this.signToken(user.id, user.email, dto.keep_session);
+      // return token generated
+      return this.signToken(user.id, user.email, dto.keep_session);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  async signUp(dto: SignUp) {
+  async signUp(dto: DTOSignUp) {
     // hash password
     const hash = await argon.hash(dto.password);
 
@@ -67,7 +71,7 @@ export class AuthService {
     }
   }
 
-  async signUpAsTechnician(dto: SignUp) {
+  async signUpAsTechnician(dto: DTOSignUp) {
     // hash password
     const hash = await argon.hash(dto.password);
     try {

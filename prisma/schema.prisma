@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
@@ -28,16 +29,20 @@ model Expert {
   user_id           Int                        @unique
   user_contact      UserContacts?
   user_favorites    UserFavorites?
-  basic             BasicProfile?
+  personal_info     ExpertPersonalInfo?
   categories_degree CategoriesDegreeOnExperts?
-  categories        CategoriesOnExperts?
-  degrees           Degree[]
+  degrees           ExpertDegree[]
   social_networks   ExpertSocialNetwork?
   user              User                       @relation(fields: [user_id], references: [id])
-  languages         Language[]
-  location          Location?
-  portfolio         Portfolio?
-  services          Service[]
+  languages         ExpertLanguage[]
+  location          ExpertLocation?
+  portfolio         ExpertPortfolio?
+  services          ExpertService[]
+  experience        ExperienceOnExperts?
+  skills            SkillsOnExperts[]
+  status            StatusOnExperts?
+
+  work_mode WorkModeOnExperts?
 
   @@map("experts")
 }
@@ -52,21 +57,19 @@ model Profile {
   @@map("profiles")
 }
 
-model BasicProfile {
+model ExpertPersonalInfo {
   id          Int     @id @default(autoincrement())
-  name        String?
   description String?
-  status      String?
-  id_status   String?
+  title       String?
   bgPhoto     String?
   picture     String?
   exp_id      Int     @unique
   expert      Expert  @relation(fields: [exp_id], references: [id])
 
-  @@map("basic_profiles")
+  @@map("expert_personal_info")
 }
 
-model Degree {
+model ExpertDegree {
   id              Int      @id @default(autoincrement())
   field           String
   academic_degree String
@@ -76,10 +79,10 @@ model Degree {
   exp_id          Int
   expert          Expert   @relation(fields: [exp_id], references: [id])
 
-  @@map("degrees")
+  @@map("expert_degrees")
 }
 
-model Service {
+model ExpertService {
   id          Int    @id @default(autoincrement())
   title       String
   price       Int
@@ -87,39 +90,37 @@ model Service {
   exp_id      Int
   expert      Expert @relation(fields: [exp_id], references: [id])
 
-  @@map("services")
+  @@map("expert_services")
 }
 
-model Language {
-  id             Int    @id @default(autoincrement())
-  language       String
-  id_language    String
-  proficiency    String
-  id_proficiency String
-  exp_id         Int
-  expert         Expert @relation(fields: [exp_id], references: [id])
+model ExpertLanguage {
+  id          Int                    @id @default(autoincrement())
+  language    LanguagesOnExperts[]
+  proficiency ProficiencyOnExperts[]
+  exp_id      Int
+  expert      Expert                 @relation(fields: [exp_id], references: [id])
 
-  @@map("languages")
+  @@map("expert_languages")
 }
 
-model Location {
+model ExpertLocation {
   id          Int    @id @default(autoincrement())
   location    String
   coordinates String
   exp_id      Int    @unique
   expert      Expert @relation(fields: [exp_id], references: [id])
 
-  @@map("locations")
+  @@map("expert_locations")
 }
 
-model Portfolio {
+model ExpertPortfolio {
   id     Int    @id @default(autoincrement())
   image  String
   cite   String
   exp_id Int    @unique
   expert Expert @relation(fields: [exp_id], references: [id])
 
-  @@map("portfolios")
+  @@map("expert_portfolios")
 }
 
 model ExpertSocialNetwork {
@@ -130,6 +131,8 @@ model ExpertSocialNetwork {
 
   @@map("expert_social_networks")
 }
+
+// TODO:  *** USER ***
 
 model UserFavorites {
   profile_id Int      @unique
@@ -151,29 +154,53 @@ model UserContacts {
   @@id([profile_id, exp_id])
 }
 
-model Category {
-  id     Int                  @id @default(autoincrement())
+// TODO: *** SKILLS ***
+
+model Skill {
+  id     Int               @id @default(autoincrement())
   name   String
-  expert CategoriesOnExperts?
+  expert SkillsOnExperts[]
 
-  @@map("categories")
+  @@map("skills")
 }
 
-model CategoriesOnExperts {
-  category_id Int      @unique
-  exp_id      Int      @unique
-  assignedAt  DateTime @default(now())
-  category    Category @relation(fields: [category_id], references: [id])
-  expert      Expert   @relation(fields: [exp_id], references: [id])
+model SkillsOnExperts {
+  skill_id   Int      @unique
+  exp_id     Int      @unique
+  assignedAt DateTime @default(now())
+  skill      Skill    @relation(fields: [skill_id], references: [id])
+  expert     Expert   @relation(fields: [exp_id], references: [id])
 
-  @@id([category_id, exp_id])
-  @@map("categories_on_experts")
+  @@id([skill_id, exp_id])
+  @@map("skills_on_experts")
 }
+
+// TODO: *** EXPERIENCE ***
+model Experience {
+  id     Int                   @id @default(autoincrement())
+  name   String
+  expert ExperienceOnExperts[]
+
+  @@map("experience")
+}
+
+model ExperienceOnExperts {
+  experience_id Int        @unique
+  exp_id        Int        @unique
+  assignedAt    DateTime   @default(now())
+  experience    Experience @relation(fields: [experience_id], references: [id])
+  expert        Expert     @relation(fields: [exp_id], references: [id])
+
+  @@id([experience_id, exp_id])
+  @@map("experience_on_experts")
+}
+
+// TODO:  *** CATEGORIES ***
 
 model CategoryDegrees {
-  id     Int                        @id @default(autoincrement())
+  id     Int                         @id @default(autoincrement())
   name   String
-  expert CategoriesDegreeOnExperts?
+  expert CategoriesDegreeOnExperts[]
 
   @@map("categories_degree")
 }
@@ -188,6 +215,92 @@ model CategoriesDegreeOnExperts {
   @@id([category_id, exp_id])
   @@map("categories_degree_on_experts")
 }
+
+// TODO: *** LANGUAGE ***
+
+model Languages {
+  id              Int                  @id @default(autoincrement())
+  name            String
+  iso             String
+  flag            String
+  language_expert LanguagesOnExperts[]
+
+  @@map("list_languages")
+}
+
+model LanguagesOnExperts {
+  language_id        Int
+  language_expert_id Int
+  assignedAt         DateTime       @default(now())
+  language           Languages      @relation(fields: [language_id], references: [id])
+  language_expert    ExpertLanguage @relation(fields: [language_expert_id], references: [id])
+
+  @@id([language_id, language_expert_id])
+  @@map("language_on_experts")
+}
+
+model Proficiency {
+  id              Int                    @id @default(autoincrement())
+  name            String
+  language_expert ProficiencyOnExperts[]
+
+  @@map("proficiency_language")
+}
+
+model ProficiencyOnExperts {
+  proficiency_id     Int
+  language_expert_id Int
+  assignedAt         DateTime       @default(now())
+  proficiency        Proficiency    @relation(fields: [proficiency_id], references: [id])
+  language_expert    ExpertLanguage @relation(fields: [language_expert_id], references: [id])
+
+  @@id([proficiency_id, language_expert_id])
+  @@map("proficiency_on_experts")
+}
+
+// TODO: *** WORK MODE ***
+
+model WorkMode {
+  id     Int                 @id @default(autoincrement())
+  name   String
+  expert WorkModeOnExperts[]
+
+  @@map("work_mode")
+}
+
+model WorkModeOnExperts {
+  work_mode_id Int      @unique
+  expert_id    Int      @unique
+  assignedAt   DateTime @default(now())
+  work_mode    WorkMode @relation(fields: [work_mode_id], references: [id])
+  expert       Expert   @relation(fields: [expert_id], references: [id])
+
+  @@id([work_mode_id, expert_id])
+  @@map("work_mode_on_experts")
+}
+
+// TODO: *** STATUS ***
+
+model Status {
+  id     Int               @id @default(autoincrement())
+  name   String
+  expert StatusOnExperts[]
+
+  @@map("status")
+}
+
+model StatusOnExperts {
+  status_id  Int      @unique
+  exp_id     Int      @unique
+  assignedAt DateTime @default(now())
+  status     Status   @relation(fields: [status_id], references: [id])
+  expert     Expert   @relation(fields: [exp_id], references: [id])
+
+  @@id([status_id, exp_id])
+  @@map("status_on_experts")
+}
+
+// TODO:  *** SOCIAL NETWORK ***
 
 model SocialNetwork {
   id   Int    @id @default(autoincrement())

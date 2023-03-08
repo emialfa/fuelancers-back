@@ -7,6 +7,7 @@ plugins:
 provider:
   name: aws
   runtime: nodejs16.x
+  timeout: 20
   environment:
     TOKEN_KEY: asdl/12#dqz-dqwd
     DATABASE_URL: postgresql://admin_thricos:Kunkka_1610@thricos-marketplace-database.c423ehsvjvmb.eu-west-1.rds.amazonaws.com:5432/postgres?connection_timeout=500&sslmode=disable
@@ -49,17 +50,35 @@ functions:
   main:
     handler: dist/serverless.handler
     layers:
-      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:4
-      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:3
+      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:5
+      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:4
     events:
       - http:
           method: ANY
           path: /
-          cors: true
+          cors:
+            origin: '*' # <-- Specify allowed origin
+            headers: # <-- Specify allowed headers
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
       - http:
           method: ANY
           path: '{proxy+}'
-          cors: true
+          cors:
+            origin: '*' # <-- Specify allowed origin
+            headers: # <-- Specify allowed headers
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: false
 
 custom:
   serverless-offline:
