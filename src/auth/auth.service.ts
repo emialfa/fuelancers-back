@@ -1,10 +1,11 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignIn, DTOSignUp, AuthGoogle } from './dto';
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { ResponseError } from 'src/common/responses/responses';
 
 @Injectable()
 export class AuthService {
@@ -20,13 +21,13 @@ export class AuthService {
       const user = await this.findUser(dto.email);
 
       // if the user does not exist throw error
-      if (!user) throw new ForbiddenException('Credentials incorrect');
+      if (!user) return ResponseError('Credentials incorrect', HttpStatus.FORBIDDEN);
 
       // compare password
       const pwMatches = await argon.verify(user.hash, dto.password);
 
       // invalid password
-      if (!pwMatches) throw new ForbiddenException('Credentials incorrect');
+      if (!pwMatches) return ResponseError('Credentials incorrect', HttpStatus.FORBIDDEN);
 
       // return user
       delete user.hash;
@@ -75,6 +76,11 @@ export class AuthService {
     // hash password
     const hash = await argon.hash(dto.password);
     try {
+      // find the user by email
+      const find_user = await this.findUser(dto.email);
+
+      // if the user does not exist throw error
+      if (find_user) return ResponseError('Credentials taken', HttpStatus.FORBIDDEN);
       // object new user
       const user = await this.prisma.user.create({
         data: {
@@ -97,10 +103,12 @@ export class AuthService {
 
       return this.signToken(user.id, user.email, false);
     } catch (error) {
+      console.log(error);
       // if exist email throw error
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
+          console.log('hola');
+          return ResponseError('Credentials taken', HttpStatus.FORBIDDEN);
         }
       }
     }

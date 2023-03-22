@@ -20,6 +20,7 @@ import {
   DTOWorkMode,
   DTOStatus,
 } from './dto';
+import { DTOSkill } from './dto/skill.dto';
 
 // @UseGuards(JwtGuard)
 @Controller('api/v1/experts')
@@ -28,22 +29,17 @@ export class ExpertController {
 
   @Get()
   async getAllExperts(@Query() querys) {
-    return this.expertService.getAllExperts(querys);
+    return this.expertService.getListExperts(querys);
   }
 
   @Get(':id_exp') // id user
   async getExpert(@Param('id_exp') id: string) {
-    return this.expertService.getExpert(id);
+    return this.expertService.getExpertById(id);
   }
 
   // NOTE: Personal Data technician table
 
-  @Post('personal-info/create/:id_exp')
-  async createPersonalInfo(@Param('id_exp') idExp: string, @Body() dto: DTOPersonalInfo) {
-    return this.expertService.createPersonalInfo(idExp, dto);
-  }
-
-  @Patch('personal-status/:id_exp')
+  @Patch('personal-info/:id_exp')
   async updatePersonalInfo(@Param('id_exp') idExp: string, @Body() dto: DTOPersonalInfo) {
     return this.expertService.updatePersonalInfo(idExp, dto);
   }
@@ -98,40 +94,36 @@ export class ExpertController {
 
   // NOTE: Languages Technician table
 
-  @Post('languages/:id_exp')
-  async createLanguage(@Param('id_exp') idExp: string, @Body() dto: DTOLanguages) {
-    return this.expertService.createLanguage(idExp, dto);
+  @Post('languages')
+  async createLanguage(@Body() dto: DTOLanguages) {
+    return this.expertService.createLanguage(dto);
   }
 
-  @Patch('languages/:id_exp') // ?id_language=:idLanguage
-  async updateLanguage(@Param('id_exp') idExp: string, @Query() querys, @Body() dto: any) {
-    return this.expertService.updateLanguage(idExp, querys, dto);
+  @Patch('languages') // ?id_language=:idLanguage
+  async updateLanguage(@Query() querys, @Body() dto: any) {
+    return this.expertService.updateLanguage(querys, dto);
   }
 
-  @Delete('languages/:id_exp') // ?id_language=:idLanguage
+  @Delete('languages') // ?id_language=:idLanguage
   async deleteLanguage(@Param('id_exp') idExp: string, @Query('id_language') idLanguage: string) {
     return this.expertService.deleteLanguage(idExp, idLanguage);
   }
 
   // NOTE: EXPERIENCE
-  @Post('experience')
-  async createExperience(@Body() dto: DTOExperience) {
-    return this.expertService.createExperience(dto);
-  }
-
   @Patch('experience')
   async updateExperience(@Body() dto: DTOExperience) {
     return this.expertService.updateExperience(dto);
   }
 
   // NOTE: Work Mode
-  @Post('work-mode')
-  async createWorkMode(@Body() dto: DTOWorkMode) {
-    return this.expertService.createWorkMode(dto);
-  }
-
   @Patch('work-mode')
   async updateWorkMode(@Body() dto: DTOWorkMode) {
     return this.expertService.updateWorkMode(dto);
+  }
+
+  // NOTE: Skills
+  @Patch('skills')
+  async updateSkills(@Body() dto: DTOSkill) {
+    return this.expertService.updateSkills(dto);
   }
 }

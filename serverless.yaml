@@ -50,8 +50,8 @@ functions:
   main:
     handler: dist/serverless.handler
     layers:
-      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:5
-      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:4
+      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:6
+      - arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:5
     events:
       - http:
           method: ANY

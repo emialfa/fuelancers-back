@@ -74,7 +74,7 @@
     "MainLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/lambda/thricos-backend-prod-main"
+        "LogGroupName": "/aws/lambda/thricos-backend-dev-main"
       }
     },
     "IamRoleLambdaExecution": {
@@ -103,7 +103,7 @@
                 "-",
                 [
                   "thricos-backend",
-                  "prod",
+                  "dev",
                   "lambda"
                 ]
               ]
@@ -115,11 +115,12 @@
                   "Effect": "Allow",
                   "Action": [
                     "logs:CreateLogStream",
-                    "logs:CreateLogGroup"
+                    "logs:CreateLogGroup",
+                    "logs:TagResource"
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/thricos-backend-prod*:*"
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/thricos-backend-dev*:*"
                     }
                   ]
                 },
@@ -130,7 +131,7 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/thricos-backend-prod*:*:*"
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/thricos-backend-dev*:*:*"
                     }
                   ]
                 }
@@ -144,7 +145,7 @@
             "-",
             [
               "thricos-backend",
-              "prod",
+              "dev",
               {
                 "Ref": "AWS::Region"
               },
@@ -161,11 +162,11 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/thricos-backend/prod/1677210398435-2023-02-24T03:46:38.435Z/thricos-backend.zip"
+          "S3Key": "serverless/thricos-backend/dev/1678561721615-2023-03-11T19:08:41.615Z/thricos-backend.zip"
         },
         "Handler": "dist/serverless.handler",
         "Runtime": "nodejs16.x",
-        "FunctionName": "thricos-backend-prod-main",
+        "FunctionName": "thricos-backend-dev-main",
         "MemorySize": 1024,
         "Timeout": 20,
         "Environment": {
@@ -184,28 +185,28 @@
           ]
         },
         "Layers": [
-          "arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:5",
-          "arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:4"
+          "arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_first:6",
+          "arn:aws:lambda:eu-west-1:683323173810:layer:node_module_thricos_second:5"
         ]
       },
       "DependsOn": [
         "MainLogGroup"
       ]
     },
-    "MainLambdaVersionDh9HnkVINS5rzYv2QH4AuDdWID2J9aFHdA7r4zdE": {
+    "MainLambdaVersionGH45vtyhAohnvWsZYYWRoXKjopwXaSgTn8BzP3KiSY": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "MainLambdaFunction"
         },
-        "CodeSha256": "xwjyOlmJS+GN+u7lWAp3E9VlpEzSFSn9CoR5w42AXPc="
+        "CodeSha256": "msTNcnH8EGhmdtVPtQHmc3FQTIBUpj+Yrc7NBr6wqE8="
       }
     },
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
-        "Name": "prod-thricos-backend",
+        "Name": "dev-thricos-backend",
         "EndpointConfiguration": {
           "Types": [
             "EDGE"
@@ -417,13 +418,13 @@
         "MainLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1677210375954": {
+    "ApiGatewayDeployment1678561702158": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
           "Ref": "ApiGatewayRestApi"
         },
-        "StageName": "prod"
+        "StageName": "dev"
       },
       "DependsOn": [
         "ApiGatewayMethodOptions",
@@ -476,16 +477,16 @@
         "Ref": "ServerlessDeploymentBucket"
       },
       "Export": {
-        "Name": "sls-thricos-backend-prod-ServerlessDeploymentBucketName"
+        "Name": "sls-thricos-backend-dev-ServerlessDeploymentBucketName"
       }
     },
     "MainLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "MainLambdaVersionDh9HnkVINS5rzYv2QH4AuDdWID2J9aFHdA7r4zdE"
+        "Ref": "MainLambdaVersionGH45vtyhAohnvWsZYYWRoXKjopwXaSgTn8BzP3KiSY"
       },
       "Export": {
-        "Name": "sls-thricos-backend-prod-MainLambdaFunctionQualifiedArn"
+        "Name": "sls-thricos-backend-dev-MainLambdaFunctionQualifiedArn"
       }
     },
     "ServiceEndpoint": {
@@ -506,12 +507,12 @@
             {
               "Ref": "AWS::URLSuffix"
             },
-            "/prod"
+            "/dev"
           ]
         ]
       },
       "Export": {
-        "Name": "sls-thricos-backend-prod-ServiceEndpoint"
+        "Name": "sls-thricos-backend-dev-ServiceEndpoint"
       }
     }
   }

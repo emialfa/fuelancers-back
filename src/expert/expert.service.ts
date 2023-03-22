@@ -10,52 +10,104 @@ import {
   DTOWorkMode,
   DTOStatus,
 } from './dto';
+import { DTOSkill } from './dto/skill.dto';
 
 @Injectable()
 export class ExpertService {
   constructor(private prisma: PrismaService) {}
 
   // services
-  async getAllExperts(querys: any) {
+  async getListExperts(querys: any) {
+    let parseQueryLanguage: number[] = [];
+
+    if (querys.language_id) {
+      parseQueryLanguage = querys.language_id.split('-').map((i: string) => parseInt(i));
+    }
+
     try {
       const expert = await this.prisma.expert.findMany({
         where: {
-          languages: {
-            some: {
-              language: {
-                some: {
-                  language_id: parseInt(querys.language_id) || {},
+          personal_info: {
+            isNot: null,
+          },
+          ...(querys.language_id && {
+            languages: {
+              some: {
+                language: {
+                  some: {
+                    language_id: {
+                      in: parseQueryLanguage,
+                    },
+                  },
+                },
+              },
+            },
+          }),
+          ...(querys.experience_id && {
+            experience: {
+              experience_id: parseInt(querys.experience_id),
+            },
+          }),
+          ...(querys.work_mode_id && {
+            work_mode: {
+              work_mode_id: parseInt(querys.work_mode_id),
+            },
+          }),
+        },
+        select: {
+          id: true,
+          user: {
+            select: {
+              first_name: true,
+              last_name: true,
+            },
+          },
+          personal_info: {},
+          status: {
+            select: {
+              status: {
+                select: {
+                  name: true,
+                  id: true,
                 },
               },
             },
           },
-          experience: {
-            experience_id: parseInt(querys.experience_id) || {},
+          skills: {
+            select: {
+              skill: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
           },
-          work_mode: {
-            work_mode_id: parseInt(querys.work_mode_id) || {},
-          },
-        },
-        select: {
-          id: true,
-          personal_info: {},
         },
       });
-
+      console.log(expert);
       return ResponseGet(expert);
     } catch (error) {
+      console.log(error);
       ResponseError(error, HttpStatus.FORBIDDEN);
     }
   }
 
   // services
-  async getExpert(id: string) {
+  async getExpertById(id: string) {
     try {
       const expert = await this.prisma.expert.findUnique({
         where: {
           id: parseInt(id),
         },
         select: {
+          id: true,
+          user: {
+            select: {
+              first_name: true,
+              last_name: true,
+            },
+          },
           personal_info: {},
           degrees: {},
           status: {
@@ -63,45 +115,44 @@ export class ExpertService {
               status: {},
             },
           },
-          languages: {},
+          languages: {
+            select: {
+              language: {
+                include: {
+                  language: {},
+                },
+              },
+              proficiency: {
+                include: {
+                  proficiency: {},
+                },
+              },
+            },
+          },
           experience: {
             include: {
               experience: {},
             },
           },
+          work_mode: {
+            include: {
+              work_mode: {},
+            },
+          },
         },
       });
 
-      if (!expert) ResponseError("The expert's profile has not been found", HttpStatus.FORBIDDEN);
+      if (!expert)
+        return ResponseError("The expert's profile has not been found", HttpStatus.FORBIDDEN);
 
       return ResponseGet(expert);
     } catch (error) {
+      console.log(error);
       return ResponseError(error);
     }
   }
 
   // Services Personal Data
-
-  async createPersonalInfo(idExp: string, dto: DTOPersonalInfo) {
-    try {
-      await this.prisma.expertPersonalInfo.create({
-        data: {
-          description: dto.description || '',
-          title: dto.title || '',
-          bgPhoto: dto.bg_photo || '',
-          picture: dto.picture || '',
-          expert: {
-            connect: { id: parseInt(idExp) },
-          },
-        },
-      });
-
-      return ResponseOK('Created successfully');
-    } catch (error) {
-      ResponseError(error, HttpStatus.FORBIDDEN);
-    }
-  }
-
   async updatePersonalInfo(idExp: string, dto: DTOPersonalInfo) {
     try {
       await this.prisma.expert.update({
@@ -110,8 +161,13 @@ export class ExpertService {
         },
         data: {
           personal_info: {
-            update: {
-              ...dto,
+            upsert: {
+              create: {
+                ...dto,
+              },
+              update: {
+                ...dto,
+              },
             },
           },
         },
@@ -119,6 +175,7 @@ export class ExpertService {
 
       return ResponseOK('updated successfully');
     } catch (error) {
+      console.log(error);
       ResponseError(error, HttpStatus.FORBIDDEN);
     }
   }
@@ -126,7 +183,6 @@ export class ExpertService {
   // Status
 
   async updateStatus(dto: DTOStatus) {
-    console.log(dto);
     try {
       await this.prisma.expert.update({
         where: {
@@ -174,8 +230,7 @@ export class ExpertService {
 
       return ResponseOK('Created successfully');
     } catch (error) {
-      ResponseError(error, HttpStatus.FORBIDDEN);
-      return ResponseError(error);
+      return ResponseError(error, HttpStatus.FORBIDDEN);
     }
   }
 
@@ -326,13 +381,13 @@ export class ExpertService {
   }
 
   // languages
-  async createLanguage(idExp: string, dto: DTOLanguages) {
+  async createLanguage(dto: DTOLanguages) {
     try {
       const createLanguageExpert = await this.prisma.expertLanguage.create({
         data: {
           expert: {
             connect: {
-              id: parseInt(idExp),
+              id: dto.id_exp,
             },
           },
         },
@@ -374,7 +429,7 @@ export class ExpertService {
     }
   }
 
-  async updateLanguage(idExp: string, querys: any, dto: DTOLanguages) {
+  async updateLanguage(querys: any, dto: DTOLanguages) {
     try {
       await this.prisma.expertLanguage.update({
         where: {
@@ -456,30 +511,6 @@ export class ExpertService {
 
   // EXPERIENCE
 
-  async createExperience(dto: DTOExperience) {
-    try {
-      await this.prisma.expert.update({
-        where: {
-          id: dto.id_exp,
-        },
-        data: {
-          experience: {
-            create: {
-              experience: {
-                connect: {
-                  id: dto.id_experience,
-                },
-              },
-            },
-          },
-        },
-      });
-      return ResponseOK('Created successfully');
-    } catch (error) {
-      return ResponseError(error, HttpStatus.FORBIDDEN);
-    }
-  }
-
   async updateExperience(dto: DTOExperience) {
     try {
       await this.prisma.expert.update({
@@ -488,10 +519,19 @@ export class ExpertService {
         },
         data: {
           experience: {
-            update: {
-              experience: {
-                connect: {
-                  id: dto.id_experience,
+            upsert: {
+              create: {
+                experience: {
+                  connect: {
+                    id: dto.id_experience,
+                  },
+                },
+              },
+              update: {
+                experience: {
+                  connect: {
+                    id: dto.id_experience,
+                  },
                 },
               },
             },
@@ -505,31 +545,6 @@ export class ExpertService {
   }
 
   // WORK MODE
-
-  async createWorkMode(dto: DTOWorkMode) {
-    try {
-      await this.prisma.expert.update({
-        where: {
-          id: dto.id_exp,
-        },
-        data: {
-          work_mode: {
-            create: {
-              work_mode: {
-                connect: {
-                  id: dto.id_work_mode,
-                },
-              },
-            },
-          },
-        },
-      });
-      return ResponseOK('Created successfully');
-    } catch (error) {
-      return ResponseError(error, HttpStatus.FORBIDDEN);
-    }
-  }
-
   async updateWorkMode(dto: DTOWorkMode) {
     try {
       await this.prisma.expert.update({
@@ -538,10 +553,19 @@ export class ExpertService {
         },
         data: {
           work_mode: {
-            update: {
-              work_mode: {
-                connect: {
-                  id: dto.id_work_mode,
+            upsert: {
+              create: {
+                work_mode: {
+                  connect: {
+                    id: dto.id_work_mode,
+                  },
+                },
+              },
+              update: {
+                work_mode: {
+                  connect: {
+                    id: dto.id_work_mode,
+                  },
                 },
               },
             },
@@ -549,6 +573,35 @@ export class ExpertService {
         },
       });
       return ResponseOK('Updated successfully');
+    } catch (error) {
+      return ResponseError(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  // NOTE: SKILLS
+
+  async updateSkills(dto: DTOSkill) {
+    try {
+      await this.prisma.expert.update({
+        where: {
+          id: dto.id_exp,
+        },
+        data: {
+          skills: {
+            create: [
+              {
+                skill: {
+                  connect: {
+                    id: dto.id_skill,
+                  },
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      return ResponseOK('Skill successfully created');
     } catch (error) {
       return ResponseError(error, HttpStatus.FORBIDDEN);
     }

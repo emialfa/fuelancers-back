@@ -1,12 +1,9 @@
 import { IsNumber } from 'class-validator';
 
-export class DTOLanguages {
+export class DTOSkill {
   @IsNumber()
   id_exp: number;
 
   @IsNumber()
-  id_language: number;
-
-  @IsNumber()
-  id_proficiency: number;
+  id_skill: number;
 }

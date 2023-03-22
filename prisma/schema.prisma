@@ -61,7 +61,7 @@ model ExpertPersonalInfo {
   id          Int     @id @default(autoincrement())
   description String?
   title       String?
-  bgPhoto     String?
+  bg_photo    String?
   picture     String?
   exp_id      Int     @unique
   expert      Expert  @relation(fields: [exp_id], references: [id])
@@ -165,8 +165,8 @@ model Skill {
 }
 
 model SkillsOnExperts {
-  skill_id   Int      @unique
-  exp_id     Int      @unique
+  skill_id   Int
+  exp_id     Int
   assignedAt DateTime @default(now())
   skill      Skill    @relation(fields: [skill_id], references: [id])
   expert     Expert   @relation(fields: [exp_id], references: [id])
@@ -185,7 +185,7 @@ model Experience {
 }
 
 model ExperienceOnExperts {
-  experience_id Int        @unique
+  experience_id Int
   exp_id        Int        @unique
   assignedAt    DateTime   @default(now())
   experience    Experience @relation(fields: [experience_id], references: [id])
@@ -269,7 +269,7 @@ model WorkMode {
 }
 
 model WorkModeOnExperts {
-  work_mode_id Int      @unique
+  work_mode_id Int
   expert_id    Int      @unique
   assignedAt   DateTime @default(now())
   work_mode    WorkMode @relation(fields: [work_mode_id], references: [id])
@@ -290,7 +290,7 @@ model Status {
 }
 
 model StatusOnExperts {
-  status_id  Int      @unique
+  status_id  Int
   exp_id     Int      @unique
   assignedAt DateTime @default(now())
   status     Status   @relation(fields: [status_id], references: [id])
