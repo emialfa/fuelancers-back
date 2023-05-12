@@ -29,12 +29,11 @@ export class UserController {
 
   @Get('me')
   async getMe(@GetUser() user: User) {
-    return user;
+    return this.userService.getUser(user.id);
   }
 
   @Patch('update/:id')
   async updateUser(@Param('id') id: string, @Body() dto: UpdateUser) {
-    console.log(dto);
     return this.userService.updateUser(id, dto);
   }
 

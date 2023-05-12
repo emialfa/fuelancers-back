@@ -13,7 +13,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
-  ) {}
+  ) { }
 
   async signIn(dto: SignIn) {
     try {
@@ -36,6 +36,7 @@ export class AuthService {
       return this.signToken(user.id, user.email, dto.keep_session);
     } catch (error) {
       console.log(error);
+      return ResponseError(error, HttpStatus.FORBIDDEN);
     }
   }
 

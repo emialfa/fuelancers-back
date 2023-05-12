@@ -1,4 +1,5 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+import { ResponseError, ResponseGet } from 'src/common/responses/responses';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUser } from './dto';
 
@@ -6,6 +7,38 @@ import { UpdateUser } from './dto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  async getUser(id: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: id,
+        },
+        select: {
+          email: true,
+          first_name: true,
+          last_name: true,
+          phone: true,
+          role: true,
+          id: true,
+          expert: {
+            select: {
+              id: true,
+            },
+          },
+          profile: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      return ResponseGet(user);
+    } catch (error) {
+      console.log(error);
+      ResponseError(error, HttpStatus.FORBIDDEN);
+    }
+  }
   async getProfile(id: string) {
     // find profile that user id is equal to id args
 
