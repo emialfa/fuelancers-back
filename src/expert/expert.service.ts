@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { ResponseOK, ResponseGet, ResponseError } from '../common/responses/responses';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -11,10 +11,11 @@ import {
   DTOStatus,
 } from './dto';
 import { DTOSkill } from './dto/skill.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ExpertService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private config: ConfigService) { }
 
   // services
   async getListExperts(querys: any) {
@@ -53,6 +54,13 @@ export class ExpertService {
               work_mode_id: parseInt(querys.work_mode_id),
             },
           }),
+          ...(querys.skill_id && {
+            skills: {
+              some: {
+                skill_id: parseInt(querys.skill_id),
+              },
+            },
+          }),
         },
         select: {
           id: true,
@@ -60,6 +68,8 @@ export class ExpertService {
             select: {
               first_name: true,
               last_name: true,
+              bg_photo: true,
+              picture: true,
             },
           },
           personal_info: {},
@@ -95,6 +105,7 @@ export class ExpertService {
 
   // services
   async getExpertById(id: string) {
+    console.log(id);
     try {
       const expert = await this.prisma.expert.findUnique({
         where: {
@@ -106,37 +117,47 @@ export class ExpertService {
             select: {
               first_name: true,
               last_name: true,
+              bg_photo: true,
+              picture: true,
             },
           },
           personal_info: {},
+          services: {},
           degrees: {},
           status: {
-            include: {
+            select: {
               status: {},
             },
           },
           languages: {
             select: {
               language: {
-                include: {
+                select: {
                   language: {},
                 },
               },
               proficiency: {
-                include: {
+                select: {
                   proficiency: {},
                 },
               },
             },
           },
           experience: {
-            include: {
+            select: {
               experience: {},
             },
           },
           work_mode: {
-            include: {
+            select: {
               work_mode: {},
+            },
+          },
+          portfolio: {
+            select: {
+              cite: true,
+              image: true,
+              id: true,
             },
           },
         },
@@ -230,6 +251,7 @@ export class ExpertService {
 
       return ResponseOK('Created successfully');
     } catch (error) {
+      console.log(error);
       return ResponseError(error, HttpStatus.FORBIDDEN);
     }
   }
@@ -605,5 +627,105 @@ export class ExpertService {
     } catch (error) {
       return ResponseError(error, HttpStatus.FORBIDDEN);
     }
+  }
+
+  async uploadImagePortfolio(file: Express.Multer.File, idExp: string, cite: string) {
+    const isValidatedType = this.validateTypeFiles(file);
+    if (!isValidatedType) {
+      return ResponseError('Invalid file format.', HttpStatus.FORBIDDEN);
+    }
+
+    try {
+      const url_img = await this.uploadImageOnImgBB(file);
+
+      await this.prisma.expertPortfolio.create({
+        data: {
+          cite: cite,
+          image: url_img,
+          expert: {
+            connect: { id: parseInt(idExp) },
+          },
+        },
+      });
+
+      return ResponseOK('Image uploaded Successfully');
+    } catch (error) {
+      return ResponseError(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async updateImagePortfolio(file: Express.Multer.File | null, cite: string, idPorfolio: string) {
+    if (!!file) {
+      const isValidatedType = this.validateTypeFiles(file);
+      if (!isValidatedType) {
+        return ResponseError('Invalid file format.', HttpStatus.FORBIDDEN);
+      }
+    }
+
+    try {
+      let url_img = '';
+      const data: { cite: string; image?: string } = {
+        cite: cite,
+      };
+      if (!!file) {
+        url_img = await this.uploadImageOnImgBB(file);
+        data.image = url_img;
+      }
+
+      await this.prisma.expertPortfolio.update({
+        where: {
+          id: parseInt(idPorfolio),
+        },
+        data: {
+          ...data,
+        },
+      });
+
+      return ResponseOK('Updated image Successfully', 200);
+    } catch (error) {
+      return ResponseError(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async deletePortfolio(idPortfolio: string) {
+    try {
+      await this.prisma.expertPortfolio.delete({
+        where: {
+          id: parseInt(idPortfolio),
+        },
+      });
+
+      return ResponseOK('Deleted image Successfully', 200);
+    } catch (error) {
+      console.log(error);
+      return ResponseError(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async uploadImageOnImgBB(file: Express.Multer.File): Promise<string> {
+    const blob = new Blob([file.buffer], { type: file.mimetype });
+    const formData = new FormData();
+    formData.append('image', blob, file.originalname);
+
+    const response = await fetch(
+      `https://api.imgbb.com/1/upload?key=${this.config.get('KEY_IMGBB')}`,
+      {
+        method: 'POST',
+        body: formData,
+      },
+    );
+    const result: any = await response.json();
+
+    return result.data.image.url;
+  }
+
+  validateTypeFiles(file: Express.Multer.File) {
+    const mimeType: string[] = ['image/jpg', 'image/jpeg', 'image/png'];
+    let isValidatedType = true;
+    if (!mimeType.includes(file.mimetype)) {
+      isValidatedType = false;
+    }
+
+    return isValidatedType;
   }
 }

@@ -1,8 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { GetUser } from './decorators';
 import { JwtGuard } from '../auth/guard';
 import { UserService } from './user.service';
 import { UpdateUser } from './dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 enum Role {
   USER,
@@ -45,5 +57,18 @@ export class UserController {
   @Get('profile/:id')
   async getProfile(@Param('id') id: string) {
     return this.userService.getProfile(id);
+  }
+
+  // NOTE: UploadImage
+  @Post('upload-image/:id_user')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(@UploadedFile() file: Express.Multer.File, @Param('id_user') dto: string) {
+    return this.userService.uploadImage(file, dto);
+  }
+  // NOTE: UploadImage
+  @Post('upload-bg-image/:id_user')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadBgImage(@UploadedFile() file: Express.Multer.File, @Param('id_user') dto: string) {
+    return this.userService.uploadBgImage(file, dto);
   }
 }

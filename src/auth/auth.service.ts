@@ -5,7 +5,7 @@ import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ResponseError } from 'src/common/responses/responses';
+import { ResponseError, ResponseOK } from 'src/common/responses/responses';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +13,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
-  ) { }
+  ) {}
 
   async signIn(dto: SignIn) {
     try {
@@ -64,6 +64,7 @@ export class AuthService {
 
       return this.signToken(user.id, user.email, false);
     } catch (error) {
+      console.log(error);
       // if exist email throw error
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {

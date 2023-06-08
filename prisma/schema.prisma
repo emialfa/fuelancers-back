@@ -20,6 +20,8 @@ model User {
   last_name  String?
   expert     Expert?
   profile    Profile?
+  bg_photo   String?
+  picture    String?
 
   @@map("users")
 }
@@ -32,17 +34,17 @@ model Expert {
   personal_info     ExpertPersonalInfo?
   categories_degree CategoriesDegreeOnExperts?
   degrees           ExpertDegree[]
-  social_networks   ExpertSocialNetwork?
+  social_networks   ExpertSocialNetwork[]
   user              User                       @relation(fields: [user_id], references: [id])
   languages         ExpertLanguage[]
   location          ExpertLocation?
-  portfolio         ExpertPortfolio?
   services          ExpertService[]
   experience        ExperienceOnExperts?
   skills            SkillsOnExperts[]
   status            StatusOnExperts?
 
   work_mode WorkModeOnExperts?
+  portfolio ExpertPortfolio[]
 
   @@map("experts")
 }
@@ -61,8 +63,6 @@ model ExpertPersonalInfo {
   id          Int     @id @default(autoincrement())
   description String?
   title       String?
-  bg_photo    String?
-  picture     String?
   exp_id      Int     @unique
   expert      Expert  @relation(fields: [exp_id], references: [id])
 
@@ -70,14 +70,14 @@ model ExpertPersonalInfo {
 }
 
 model ExpertDegree {
-  id              Int      @id @default(autoincrement())
+  id              Int    @id @default(autoincrement())
   field           String
   academic_degree String
-  start           DateTime
+  start           String
   end             String
   school          String
   exp_id          Int
-  expert          Expert   @relation(fields: [exp_id], references: [id])
+  expert          Expert @relation(fields: [exp_id], references: [id])
 
   @@map("expert_degrees")
 }
@@ -117,7 +117,7 @@ model ExpertPortfolio {
   id     Int    @id @default(autoincrement())
   image  String
   cite   String
-  exp_id Int    @unique
+  exp_id Int
   expert Expert @relation(fields: [exp_id], references: [id])
 
   @@map("expert_portfolios")
@@ -126,7 +126,7 @@ model ExpertPortfolio {
 model ExpertSocialNetwork {
   id     Int    @id @default(autoincrement())
   name   String
-  exp_id Int    @unique
+  exp_id Int
   expert Expert @relation(fields: [exp_id], references: [id])
 
   @@map("expert_social_networks")

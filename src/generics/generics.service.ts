@@ -9,7 +9,7 @@ import { ResponseGet, ResponseError, ResponseOK } from 'src/common/responses/res
 
 @Injectable()
 export class GenericsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getDegreeCategories() {
     try {
@@ -55,6 +55,7 @@ export class GenericsService {
 
       return ResponseGet(languageList);
     } catch (error) {
+      console.log(error);
       return ResponseError(error);
     }
   }

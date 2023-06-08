@@ -1,11 +1,12 @@
 import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
-import { ResponseError, ResponseGet } from 'src/common/responses/responses';
+import { ResponseError, ResponseGet, ResponseOK } from 'src/common/responses/responses';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUser } from './dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private config: ConfigService) { }
 
   async getUser(id: number) {
     try {
@@ -20,6 +21,8 @@ export class UserService {
           phone: true,
           role: true,
           id: true,
+          picture: true,
+          bg_photo: true,
           expert: {
             select: {
               id: true,
@@ -103,5 +106,82 @@ export class UserService {
     });
 
     if (!user) throw new ForbiddenException('User not found');
+  }
+
+  // NOTE: UPLOAD IMAGE
+  async uploadImage(file: Express.Multer.File, dto: string) {
+    const isValidatedType = this.validateTypeFiles(file);
+    if (!isValidatedType) {
+      return ResponseError('Invalid file format.', HttpStatus.FORBIDDEN);
+    }
+
+    try {
+      const url_img = await this.uploadImageOnImgBB(file);
+
+      await this.prisma.user.update({
+        where: {
+          id: parseInt(dto),
+        },
+        data: {
+          picture: url_img,
+        },
+      });
+
+      return ResponseOK('Image uploaded Successfully');
+    } catch (error) {
+      return ResponseError(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  // NOTE: UPLOAD IMAGE
+  async uploadBgImage(file: Express.Multer.File, dto: string) {
+    const isValidatedType = this.validateTypeFiles(file);
+    if (!isValidatedType) {
+      return ResponseError('Invalid file format.', HttpStatus.FORBIDDEN);
+    }
+
+    try {
+      const url_img = await this.uploadImageOnImgBB(file);
+
+      await this.prisma.user.update({
+        where: {
+          id: parseInt(dto),
+        },
+        data: {
+          bg_photo: url_img,
+        },
+      });
+
+      return ResponseOK('Image uploaded Successfully');
+    } catch (error) {
+      return ResponseError(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async uploadImageOnImgBB(file: Express.Multer.File) {
+    const blob = new Blob([file.buffer], { type: file.mimetype });
+    const formData = new FormData();
+    formData.append('image', blob, file.originalname);
+
+    const response = await fetch(
+      `https://api.imgbb.com/1/upload?key=${this.config.get('KEY_IMGBB')}`,
+      {
+        method: 'POST',
+        body: formData,
+      },
+    );
+    const result: any = await response.json();
+
+    return result.data.image.url;
+  }
+
+  validateTypeFiles(file: Express.Multer.File) {
+    const mimeType: string[] = ['image/jpg', 'image/jpeg', 'image/png'];
+    let isValidatedType = true;
+    if (!mimeType.includes(file.mimetype)) {
+      isValidatedType = false;
+    }
+
+    return isValidatedType;
   }
 }

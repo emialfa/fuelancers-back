@@ -6,8 +6,10 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
-  UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { ExpertService } from './expert.service';
@@ -21,11 +23,12 @@ import {
   DTOStatus,
 } from './dto';
 import { DTOSkill } from './dto/skill.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 // @UseGuards(JwtGuard)
 @Controller('api/v1/experts')
 export class ExpertController {
-  constructor(private expertService: ExpertService) {}
+  constructor(private expertService: ExpertService) { }
 
   @Get()
   async getAllExperts(@Query() querys) {
@@ -125,5 +128,33 @@ export class ExpertController {
   @Patch('skills')
   async updateSkills(@Body() dto: DTOSkill) {
     return this.expertService.updateSkills(dto);
+  }
+
+  // NOTE: UploadImage
+  @Post('portfolio/:id_exp')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadBgImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id_exp') dto: string,
+    @Body() body: any,
+  ) {
+    return this.expertService.uploadImagePortfolio(file, dto, body.cite);
+  }
+
+  // NOTE: UploadImage
+  @Patch('portfolio')
+  @UseInterceptors(FileInterceptor('image'))
+  async updateImagePortfolio(
+    @UploadedFile() file: Express.Multer.File,
+    @Query('id_portfolio') idPorfolio: string,
+    @Body() body: any,
+  ) {
+    return this.expertService.updateImagePortfolio(file, body.cite, idPorfolio);
+  }
+
+  // NOTE: UploadImage
+  @Delete('portfolio')
+  async deletePortfolio(@Query('id_portfolio') idPortfolio: string) {
+    return this.expertService.deletePortfolio(idPortfolio);
   }
 }
