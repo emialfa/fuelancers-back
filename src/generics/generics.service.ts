@@ -9,7 +9,7 @@ import { ResponseGet, ResponseError, ResponseOK } from 'src/common/responses/res
 
 @Injectable()
 export class GenericsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async getDegreeCategories() {
     try {

@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService, private config: ConfigService) { }
+  constructor(private prisma: PrismaService, private config: ConfigService) {}
 
   async getUser(id: number) {
     try {
@@ -185,3 +185,64 @@ export class UserService {
     return isValidatedType;
   }
 }
+
+// MONGOOSE MIGRATION
+
+// import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+// import { ResponseError, ResponseGet, ResponseOK } from 'src/common/responses/responses';
+// import { InjectModel } from '@nestjs/mongoose';
+// import { Model } from 'mongoose';
+// import { User } from './user.model';
+// import { UpdateUser } from './dto';
+// import { ConfigService } from '@nestjs/config';
+
+// @Injectable()
+// export class UserService {
+//   constructor(
+//     @InjectModel(User.name) private readonly userModel: Model<User>,
+//     private config: ConfigService,
+//   ) {}
+
+//   async getUser(id: string) {
+//     try {
+//       const user = await this.userModel.findById(id);
+//       return ResponseGet(user);
+//     } catch (error) {
+//       console.error(error);
+//       ResponseError(error, HttpStatus.FORBIDDEN);
+//     }
+//   }
+
+//   // ... rest of the methods
+
+//   async updateUser(id: string, dto: UpdateUser) {
+//     await this.checkExistUser(id);
+
+//     try {
+//       const updatedUser = await this.userModel.findByIdAndUpdate(
+//         id,
+//         { $set: dto },
+//         { new: true },
+//       );
+
+//       return ResponseOK('Updated user.', updatedUser);
+//     } catch (error) {
+//       console.error(error);
+//       return ResponseError(error, HttpStatus.FORBIDDEN);
+//     }
+//   }
+
+//   async deleteUser(id: string) {
+//     await this.checkExistUser(id);
+
+//     try {
+//       await this.userModel.findByIdAndDelete(id);
+//       return ResponseOK('Deleted user.');
+//     } catch (error) {
+//       console.error(error);
+//       return ResponseError(error, HttpStatus.FORBIDDEN);
+//     }
+//   }
+
+//   // ... rest of the methods
+// }
