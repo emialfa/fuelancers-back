@@ -180,3 +180,147 @@ export class GenericsService {
     }
   }
 }
+
+// Migrating to mongoose
+
+/*
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { ListDTO } from './dto/list.dto';
+import { ResponseGet, ResponseError, ResponseOK } from 'src/common/responses/responses';
+
+@Injectable()
+export class GenericsService {
+  constructor(@InjectModel('List') private readonly listModel: Model<any>) {}
+
+  async getDegreeCategories() {
+    try {
+      const categoriesList = await this.listModel.find().exec();
+      return ResponseGet(categoriesList);
+    } catch (error) {
+      console.log(error);
+      return ResponseError(error);
+    }
+  }
+
+  async createDegreeCategories(dto: ListDTO) {
+    try {
+      await this.listModel.create(dto);
+      return ResponseOK('created successfully');
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async createLanguage(dto: ListDTO) {
+    try {
+      await this.listModel.create(dto);
+      return ResponseOK('created successfully');
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async getLanguage() {
+    try {
+      const languageList = await this.listModel.find().exec();
+      return ResponseGet(languageList);
+    } catch (error) {
+      console.log(error);
+      return ResponseError(error);
+    }
+  }
+
+  async createProficiency(dto: ListDTO) {
+    try {
+      await this.listModel.create(dto);
+      return ResponseOK('created successfully');
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async getProficiency() {
+    try {
+      const proficiencyList = await this.listModel.find().exec();
+      return ResponseGet(proficiencyList);
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async createWorkMode(dto: ListDTO) {
+    try {
+      await this.listModel.create(dto);
+      return ResponseOK('created successfully');
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async getWorkMode() {
+    try {
+      const workModeList = await this.listModel.find().exec();
+      return ResponseGet(workModeList);
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async createExperience(dto: ListDTO) {
+    try {
+      await this.listModel.create(dto);
+      return ResponseOK('created successfully');
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async getExperience() {
+    try {
+      const experienceList = await this.listModel.find().exec();
+      return ResponseGet(experienceList);
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async createSkill(dto: ListDTO) {
+    try {
+      await this.listModel.create(dto);
+      return ResponseOK('created successfully');
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async getSkills() {
+    try {
+      const skillList = await this.listModel.find().exec();
+      return ResponseGet(skillList);
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async createStatus(dto: ListDTO) {
+    try {
+      await this.listModel.create(dto);
+      return ResponseOK('created successfully');
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
+  async getStatus() {
+    try {
+      const statusList = await this.listModel.find().exec();
+      return ResponseGet(statusList);
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+}
+
+*/
