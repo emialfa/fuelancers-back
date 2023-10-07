@@ -186,63 +186,146 @@ export class UserService {
   }
 }
 
-// MONGOOSE MIGRATION
+/* MONGOOSE MIGRATION
+ import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+ import { ResponseError, ResponseGet, ResponseOK } from 'src/common/responses/responses';
+ import { InjectModel } from '@nestjs/mongoose';
+ import { Model } from 'mongoose';
+ import { User } from './user.model';
+ import { UpdateUser } from './dto';
+ import { ConfigService } from '@nestjs/config';
+ @Injectable()
+ export class UserService {
+   constructor(
+     @InjectModel(User.name) private readonly userModel: Model<User>,
+     private config: ConfigService,
+   ) {}
 
-// import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
-// import { ResponseError, ResponseGet, ResponseOK } from 'src/common/responses/responses';
-// import { InjectModel } from '@nestjs/mongoose';
-// import { Model } from 'mongoose';
-// import { User } from './user.model';
-// import { UpdateUser } from './dto';
-// import { ConfigService } from '@nestjs/config';
+async getUser(id: number) {
+  try {
+    const user = await this.userModel.findById(id).select('email first_name last_name phone role id picture bg_photo').exec();
 
-// @Injectable()
-// export class UserService {
-//   constructor(
-//     @InjectModel(User.name) private readonly userModel: Model<User>,
-//     private config: ConfigService,
-//   ) {}
+    return ResponseGet(user);
+  } catch (error) {
+    console.log(error);
+    ResponseError(error, HttpStatus.FORBIDDEN);
+  }
+}
 
-//   async getUser(id: string) {
-//     try {
-//       const user = await this.userModel.findById(id);
-//       return ResponseGet(user);
-//     } catch (error) {
-//       console.error(error);
-//       ResponseError(error, HttpStatus.FORBIDDEN);
-//     }
-//   }
+async getProfile(id: string) {
+  const profile = await this.userModel.findById(id).exec();
 
-//   // ... rest of the methods
+  if (!profile) throw new ForbiddenException('User profile not found');
 
-//   async updateUser(id: string, dto: UpdateUser) {
-//     await this.checkExistUser(id);
+  return profile;
+}
 
-//     try {
-//       const updatedUser = await this.userModel.findByIdAndUpdate(
-//         id,
-//         { $set: dto },
-//         { new: true },
-//       );
+async updateUser(id: string, dto: UpdateUser) {
+  // check if the user exists
+  await this.checkExistUser(id);
 
-//       return ResponseOK('Updated user.', updatedUser);
-//     } catch (error) {
-//       console.error(error);
-//       return ResponseError(error, HttpStatus.FORBIDDEN);
-//     }
-//   }
+  // find profile that user id is equal to id args
+  await this.userModel.findByIdAndUpdate(id, { ...dto }).exec();
 
-//   async deleteUser(id: string) {
-//     await this.checkExistUser(id);
+  return {
+    success: 'Updated user.',
+  };
+}
 
-//     try {
-//       await this.userModel.findByIdAndDelete(id);
-//       return ResponseOK('Deleted user.');
-//     } catch (error) {
-//       console.error(error);
-//       return ResponseError(error, HttpStatus.FORBIDDEN);
-//     }
-//   }
+async deleteUser(id: string) {
+  // check if the user id exists
+  await this.checkExistUser(id);
 
-//   // ... rest of the methods
-// }
+  // delete user profile
+  await this.userModel.findByIdAndDelete(id).exec();
+
+  return {
+    success: 'Deleted user.',
+  };
+}
+
+async checkExistUser(id: string) {
+  const user = await this.userModel.findById(id).exec();
+
+  if (!user) throw new ForbiddenException('User not found');
+}
+
+
+
+// NOTE: UPLOAD IMAGE
+async uploadImage(file: Express.Multer.File, dto: string) {
+  const isValidatedType = this.validateTypeFiles(file);
+  if (!isValidatedType) {
+    return ResponseError('Invalid file format.', HttpStatus.FORBIDDEN);
+  }
+
+  try {
+    const url_img = await this.uploadImageOnImgBB(file);
+
+    await this.prisma.user.update({
+      where: {
+        id: parseInt(dto),
+      },
+      data: {
+        picture: url_img,
+      },
+    });
+
+    return ResponseOK('Image uploaded Successfully');
+  } catch (error) {
+    return ResponseError(error, HttpStatus.FORBIDDEN);
+  }
+}
+
+// NOTE: UPLOAD IMAGE
+async uploadBgImage(file: Express.Multer.File, dto: string) {
+  const isValidatedType = this.validateTypeFiles(file);
+  if (!isValidatedType) {
+    return ResponseError('Invalid file format.', HttpStatus.FORBIDDEN);
+  }
+
+  try {
+    const url_img = await this.uploadImageOnImgBB(file);
+
+    await this.prisma.user.update({
+      where: {
+        id: parseInt(dto),
+      },
+      data: {
+        bg_photo: url_img,
+      },
+    });
+
+    return ResponseOK('Image uploaded Successfully');
+  } catch (error) {
+    return ResponseError(error, HttpStatus.FORBIDDEN);
+  }
+}
+
+async uploadImageOnImgBB(file: Express.Multer.File) {
+  const blob = new Blob([file.buffer], { type: file.mimetype });
+  const formData = new FormData();
+  formData.append('image', blob, file.originalname);
+
+  const response = await fetch(
+    `https://api.imgbb.com/1/upload?key=${this.config.get('KEY_IMGBB')}`,
+    {
+      method: 'POST',
+      body: formData,
+    },
+  );
+  const result: any = await response.json();
+
+  return result.data.image.url;
+}
+
+validateTypeFiles(file: Express.Multer.File) {
+  const mimeType: string[] = ['image/jpg', 'image/jpeg', 'image/png'];
+  let isValidatedType = true;
+  if (!mimeType.includes(file.mimetype)) {
+    isValidatedType = false;
+  }
+
+  return isValidatedType;
+}
+}*/

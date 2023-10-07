@@ -1,6 +1,6 @@
 // user.model.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export enum Role {
   USER = 'USER',
@@ -29,16 +29,69 @@ export class User extends Document {
   lastName: string;
 
   @Prop()
-  createdAt: Date;
-
-  @Prop()
-  updatedAt: Date;
-
-  @Prop()
   picture: string;
 
   @Prop()
   bgPhoto: string;
+
+  @Prop()
+  profileInfo: {
+    titulo: string;
+    description: string;
+  };
+
+  @Prop([{ user: { type: MongooseSchema.Types.ObjectId, ref: 'User' }, createdAt: Date }])
+  contacts: { user: any; createdAt: Date }[];
+
+  @Prop([{ user: { type: MongooseSchema.Types.ObjectId, ref: 'User' }, createdAt: Date }])
+  favorites: { user: any; createdAt: Date }[];
+
+  @Prop([{ category: { type: MongooseSchema.Types.ObjectId, ref: 'Category' }, createdAt: Date }])
+  categories: { category: any; createdAt: Date }[];
+
+  @Prop([
+    { experience: { type: MongooseSchema.Types.ObjectId, ref: 'Experience' }, createdAt: Date },
+  ])
+  experiences: { experience: any; createdAt: Date }[];
+
+  @Prop([
+    {
+      language: { type: MongooseSchema.Types.ObjectId, ref: 'Language' },
+      proficiency: { type: MongooseSchema.Types.ObjectId, ref: 'Proficiency' },
+      createdAt: Date,
+    },
+  ])
+  languages: { language: any; proficiency: any; createdAt: Date }[];
+
+  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Degree' }])
+  degrees: any[];
+
+  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Location' }])
+  locations: any[];
+
+  @Prop([{ skill: { type: MongooseSchema.Types.ObjectId, ref: 'Skill' }, createdAt: Date }])
+  skills: { skill: any; createdAt: Date }[];
+
+  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Service' }])
+  services: any[];
+
+  @Prop([{ status: { type: MongooseSchema.Types.ObjectId, ref: 'Status' }, createdAt: Date }])
+  status: { status: any; createdAt: Date }[];
+
+  @Prop([{ workmode: { type: MongooseSchema.Types.ObjectId, ref: 'WorkMode' }, createdAt: Date }])
+  workmodes: { workmode: any; createdAt: Date }[];
+
+  @Prop([{ portfolio: { type: MongooseSchema.Types.ObjectId, ref: 'Portfolio' }, createdAt: Date }])
+  portfolios: { portfolio: any; createdAt: Date }[];
+
+  @Prop([{ name: String, link: String }])
+  socialNetworks: { name: string; link: string }[];
+
+  @Prop()
+  createdAt: Date;
+
+  @Prop()
+  updatedAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

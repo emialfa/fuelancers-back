@@ -28,7 +28,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 // @UseGuards(JwtGuard)
 @Controller('api/v1/experts')
 export class ExpertController {
-  constructor(private expertService: ExpertService) { }
+  constructor(private expertService: ExpertService) {}
 
   @Get()
   async getAllExperts(@Query() querys) {
