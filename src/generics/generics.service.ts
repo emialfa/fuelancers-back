@@ -1,19 +1,45 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 
 // dto
 import { ListDTO } from './dto/list.dto';
 
 // response
 import { ResponseGet, ResponseError, ResponseOK } from 'src/common/responses/responses';
+import { Category } from './models/category.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Degree } from './models/degree.model';
+import { Experience } from './models/experience.mode';
+import { Language } from './models/language.model';
+import { Location } from './models/location.model';
+import { Portfolio } from './models/portfolio.model';
+import { ProficiencyLanguage } from './models/proficiencyLanguage.model';
+import { Service } from './models/service.model';
+import { Skill } from './models/skill.model';
+import { Status } from './models/status.model';
+import { Workmode } from './models/workmode.model';
 
 @Injectable()
 export class GenericsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
+    @InjectModel(Degree.name) private readonly degreeModel: Model<Degree>,
+    @InjectModel(Experience.name) private readonly experienceModel: Model<Experience>,
+    @InjectModel(Language.name) private readonly languageModel: Model<Language>,
+    @InjectModel(Location.name) private readonly locationModel: Model<Location>,
+    @InjectModel(Portfolio.name) private readonly portfolioModel: Model<Portfolio>,
+    @InjectModel(ProficiencyLanguage.name)
+    private readonly proficiencyLanguageModel: Model<ProficiencyLanguage>,
+    @InjectModel(Service.name) private readonly serviceModel: Model<Service>,
+    @InjectModel(Skill.name) private readonly skillModel: Model<Skill>,
+    @InjectModel(Status.name) private readonly statusModel: Model<Status>,
+    @InjectModel(Workmode.name) private readonly workmodeModel: Model<Workmode>,
+  ) {}
 
   async getDegreeCategories() {
     try {
-      const categoriesList = await this.prisma.categoryDegrees.findMany();
+      // const categoriesList = await this.prisma.categoryDegrees.findMany();
+      const categoriesList = await this.categoryModel.find();
 
       return ResponseGet(categoriesList);
     } catch (error) {
@@ -24,10 +50,8 @@ export class GenericsService {
 
   async createDegreeCategories(dto: ListDTO) {
     try {
-      await this.prisma.categoryDegrees.create({
-        data: {
-          ...dto,
-        },
+      await this.degreeModel.create({
+        ...dto,
       });
       return ResponseOK('created successfully');
     } catch (error) {
@@ -38,10 +62,8 @@ export class GenericsService {
   // NOTE: *** LANGUAGE ***
   async createLanguage(dto: ListDTO) {
     try {
-      await this.prisma.languages.create({
-        data: {
-          ...dto,
-        },
+      await this.languageModel.create({
+        ...dto,
       });
       return ResponseOK('created successfully');
     } catch (error) {
@@ -51,7 +73,7 @@ export class GenericsService {
 
   async getLanguage() {
     try {
-      const languageList = await this.prisma.languages.findMany();
+      const languageList = await this.languageModel.find();
 
       return ResponseGet(languageList);
     } catch (error) {
@@ -63,10 +85,8 @@ export class GenericsService {
   // NOTE: *** PROFICIENCY ***
   async createProficiency(dto: ListDTO) {
     try {
-      await this.prisma.proficiency.create({
-        data: {
-          ...dto,
-        },
+      await this.proficiencyLanguageModel.create({
+        ...dto,
       });
       return ResponseOK('created successfully');
     } catch (error) {
@@ -76,7 +96,7 @@ export class GenericsService {
 
   async getProficiency() {
     try {
-      const languageList = await this.prisma.proficiency.findMany();
+      const languageList = await this.proficiencyLanguageModel.find();
 
       return ResponseGet(languageList);
     } catch (error) {
@@ -87,10 +107,8 @@ export class GenericsService {
   // NOTE: *** WORK MODE ***
   async createWorkMode(dto: ListDTO) {
     try {
-      await this.prisma.workMode.create({
-        data: {
-          ...dto,
-        },
+      await this.workmodeModel.create({
+        ...dto,
       });
       return ResponseOK('created successfully');
     } catch (error) {
@@ -100,7 +118,7 @@ export class GenericsService {
 
   async getWorkMode() {
     try {
-      const workModeList = await this.prisma.workMode.findMany();
+      const workModeList = await this.workmodeModel.find();
 
       return ResponseGet(workModeList);
     } catch (error) {
@@ -111,10 +129,8 @@ export class GenericsService {
   // NOTE: *** EXPERIENCE ***
   async createExperience(dto: ListDTO) {
     try {
-      await this.prisma.experience.create({
-        data: {
-          ...dto,
-        },
+      await this.experienceModel.create({
+        ...dto,
       });
       return ResponseOK('created successfully');
     } catch (error) {
@@ -124,7 +140,7 @@ export class GenericsService {
 
   async getExperience() {
     try {
-      const experienceList = await this.prisma.experience.findMany();
+      const experienceList = await this.experienceModel.find();
 
       return ResponseGet(experienceList);
     } catch (error) {
@@ -135,10 +151,8 @@ export class GenericsService {
   // NOTE: *** SKILLS ***
   async createSkill(dto: ListDTO) {
     try {
-      await this.prisma.skill.create({
-        data: {
-          ...dto,
-        },
+      await this.skillModel.create({
+        ...dto,
       });
       return ResponseOK('created successfully');
     } catch (error) {
@@ -148,7 +162,7 @@ export class GenericsService {
 
   async getSkills() {
     try {
-      const skillList = await this.prisma.skill.findMany();
+      const skillList = await this.skillModel.find();
 
       return ResponseGet(skillList);
     } catch (error) {
@@ -159,10 +173,8 @@ export class GenericsService {
   // NOTE: *** STATUS ***
   async createStatus(dto: ListDTO) {
     try {
-      await this.prisma.status.create({
-        data: {
-          ...dto,
-        },
+      await this.statusModel.create({
+        ...dto,
       });
       return ResponseOK('created successfully');
     } catch (error) {
@@ -172,7 +184,7 @@ export class GenericsService {
 
   async getStatus() {
     try {
-      const skillList = await this.prisma.status.findMany();
+      const skillList = await this.statusModel.find();
 
       return ResponseGet(skillList);
     } catch (error) {
@@ -180,147 +192,3 @@ export class GenericsService {
     }
   }
 }
-
-// Migrating to mongoose
-
-/*
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { ListDTO } from './dto/list.dto';
-import { ResponseGet, ResponseError, ResponseOK } from 'src/common/responses/responses';
-
-@Injectable()
-export class GenericsService {
-  constructor(@InjectModel('List') private readonly listModel: Model<any>) {}
-
-  async getDegreeCategories() {
-    try {
-      const categoriesList = await this.listModel.find().exec();
-      return ResponseGet(categoriesList);
-    } catch (error) {
-      console.log(error);
-      return ResponseError(error);
-    }
-  }
-
-  async createDegreeCategories(dto: ListDTO) {
-    try {
-      await this.listModel.create(dto);
-      return ResponseOK('created successfully');
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async createLanguage(dto: ListDTO) {
-    try {
-      await this.listModel.create(dto);
-      return ResponseOK('created successfully');
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async getLanguage() {
-    try {
-      const languageList = await this.listModel.find().exec();
-      return ResponseGet(languageList);
-    } catch (error) {
-      console.log(error);
-      return ResponseError(error);
-    }
-  }
-
-  async createProficiency(dto: ListDTO) {
-    try {
-      await this.listModel.create(dto);
-      return ResponseOK('created successfully');
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async getProficiency() {
-    try {
-      const proficiencyList = await this.listModel.find().exec();
-      return ResponseGet(proficiencyList);
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async createWorkMode(dto: ListDTO) {
-    try {
-      await this.listModel.create(dto);
-      return ResponseOK('created successfully');
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async getWorkMode() {
-    try {
-      const workModeList = await this.listModel.find().exec();
-      return ResponseGet(workModeList);
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async createExperience(dto: ListDTO) {
-    try {
-      await this.listModel.create(dto);
-      return ResponseOK('created successfully');
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async getExperience() {
-    try {
-      const experienceList = await this.listModel.find().exec();
-      return ResponseGet(experienceList);
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async createSkill(dto: ListDTO) {
-    try {
-      await this.listModel.create(dto);
-      return ResponseOK('created successfully');
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async getSkills() {
-    try {
-      const skillList = await this.listModel.find().exec();
-      return ResponseGet(skillList);
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async createStatus(dto: ListDTO) {
-    try {
-      await this.listModel.create(dto);
-      return ResponseOK('created successfully');
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-
-  async getStatus() {
-    try {
-      const statusList = await this.listModel.find().exec();
-      return ResponseGet(statusList);
-    } catch (error) {
-      return ResponseError(error);
-    }
-  }
-}
-
-*/

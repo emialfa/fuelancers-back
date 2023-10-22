@@ -1,8 +1,9 @@
 import { IsString } from 'class-validator';
 
-export class DTOWorkMode {
-  @IsString()
-  id_work_mode: string;
+export class DTOStatus {
   @IsString()
   id_exp: string;
+
+  @IsString()
+  id_status: string;
 }

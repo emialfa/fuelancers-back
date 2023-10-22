@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ExpertService } from './expert.service';
-import { ExpertController } from './expert.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/user.model';
 import { Degree, DegreeSchema } from '../generics/models/degree.model';
 import { Service, ServiceSchema } from '../generics/models/service.model';
 import { Portfolio, PortfolioSchema } from '../generics/models/portfolio.model';
+import { ProfileController } from './profile.controller';
+import { ProfileService } from './profile.service';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -15,7 +15,7 @@ import { Portfolio, PortfolioSchema } from '../generics/models/portfolio.model';
       { name: Portfolio.name, schema: PortfolioSchema },
     ]),
   ],
-  providers: [ExpertService],
-  controllers: [ExpertController],
+  providers: [ProfileService],
+  controllers: [ProfileController],
 })
-export class ExpertModule {}
+export class ProfileModule {}

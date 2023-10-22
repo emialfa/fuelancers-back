@@ -1,23 +1,19 @@
 import { IsOptional, IsString } from 'class-validator';
 
-export class DTODegrees {
+export class DTOPersonalInfo {
   @IsString()
   @IsOptional()
-  field: string;
+  title: string;
 
   @IsString()
   @IsOptional()
-  academicDegree: string;
+  description: string;
 
   @IsString()
   @IsOptional()
-  start: string;
+  bg_photo: string;
 
   @IsString()
   @IsOptional()
-  end: string;
-
-  @IsString()
-  @IsOptional()
-  school: string;
+  picture: string;
 }

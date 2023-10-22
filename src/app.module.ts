@@ -1,22 +1,24 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 // modules
 import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ExpertModule } from './expert/expert.module';
 import { GenericsModule } from './generics/generics.module';
 // middleware technician
-import { CheckerExpertMiddleware } from './common/middlewares/checkerExpert.middleware';
-import { ExpertController } from './expert/expert.controller';
+// import { CheckerExpertMiddleware } from './common/middlewares/checkerExpert.middleware';
+// import { ExpertController } from './expert/expert.controller';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRoot(process.env.MONGODB_URI),
     AuthModule,
-    PrismaModule,
     UserModule,
     ExpertModule,
+    ProfileModule,
     GenericsModule,
   ],
   controllers: [],

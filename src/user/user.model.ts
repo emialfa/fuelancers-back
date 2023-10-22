@@ -4,7 +4,7 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 
 export enum Role {
   USER = 'USER',
-  TECHNICIAN = 'TECHNICIAN',
+  TECHNICIAN = 'EXPERT',
   ADMIN = 'ADMIN',
 }
 
@@ -34,9 +34,9 @@ export class User extends Document {
   @Prop()
   bgPhoto: string;
 
-  @Prop()
+  @Prop({ type: { title: String, description: String } })
   profileInfo: {
-    titulo: string;
+    title: string;
     description: string;
   };
 
@@ -49,15 +49,18 @@ export class User extends Document {
   @Prop([{ category: { type: MongooseSchema.Types.ObjectId, ref: 'Category' }, createdAt: Date }])
   categories: { category: any; createdAt: Date }[];
 
-  @Prop([
-    { experience: { type: MongooseSchema.Types.ObjectId, ref: 'Experience' }, createdAt: Date },
-  ])
-  experiences: { experience: any; createdAt: Date }[];
+  @Prop({
+    type: {
+      experience: { type: MongooseSchema.Types.ObjectId, ref: 'Experience' },
+      createdAt: Date,
+    },
+  })
+  experience: { experience: any; createdAt: Date };
 
   @Prop([
     {
       language: { type: MongooseSchema.Types.ObjectId, ref: 'Language' },
-      proficiency: { type: MongooseSchema.Types.ObjectId, ref: 'Proficiency' },
+      proficiency: { type: MongooseSchema.Types.ObjectId, ref: 'ProficiencyLanguage' },
       createdAt: Date,
     },
   ])
@@ -75,11 +78,15 @@ export class User extends Document {
   @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Service' }])
   services: any[];
 
-  @Prop([{ status: { type: MongooseSchema.Types.ObjectId, ref: 'Status' }, createdAt: Date }])
-  status: { status: any; createdAt: Date }[];
+  @Prop({
+    type: { status: { type: MongooseSchema.Types.ObjectId, ref: 'Status' }, createdAt: Date },
+  })
+  status: { status: any; createdAt: Date };
 
-  @Prop([{ workmode: { type: MongooseSchema.Types.ObjectId, ref: 'WorkMode' }, createdAt: Date }])
-  workmodes: { workmode: any; createdAt: Date }[];
+  @Prop({
+    type: { workmode: { type: MongooseSchema.Types.ObjectId, ref: 'Workmode' }, createdAt: Date },
+  })
+  workmode: { workmode: any; createdAt: Date };
 
   @Prop([{ portfolio: { type: MongooseSchema.Types.ObjectId, ref: 'Portfolio' }, createdAt: Date }])
   portfolios: { portfolio: any; createdAt: Date }[];

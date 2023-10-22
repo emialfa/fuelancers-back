@@ -1,9 +1,9 @@
-import { IsNumber } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class DTOStatus {
-  @IsNumber()
+  @IsString()
   id_exp: number;
 
-  @IsNumber()
+  @IsString()
   id_status: number;
 }

@@ -1,16 +1,17 @@
 import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { SignIn, DTOSignUp, AuthGoogle } from './dto';
 import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ResponseError, ResponseOK } from 'src/common/responses/responses';
+import { ResponseError } from 'src/common/responses/responses';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Role, User } from '../user/user.model';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     private jwt: JwtService,
     private config: ConfigService,
   ) {}
@@ -18,7 +19,8 @@ export class AuthService {
   async signIn(dto: SignIn) {
     try {
       // find the user by email
-      const user = await this.findUser(dto.email);
+      const user = await this.userModel.findOne({ email: dto.email });
+      // const user = await this.findUser(dto.email);
 
       // if the user does not exist throw error
       if (!user) return ResponseError('Credentials incorrect', HttpStatus.FORBIDDEN);
@@ -45,19 +47,26 @@ export class AuthService {
     const hash = await argon.hash(dto.password);
 
     try {
-      // object new user
-      const user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          hash,
-          first_name: dto.first_name,
-          last_name: dto.last_name,
-          phone: dto.phone,
-          profile: {
-            create: {},
-          },
-        },
+      const user = await this.userModel.create({
+        email: dto.email,
+        hash,
+        firstName: dto.first_name,
+        lastName: dto.last_name,
+        phone: dto.phone,
       });
+      // object new user
+      // const user = await this.prisma.user.create({
+      //   data: {
+      //     email: dto.email,
+      //     hash,
+      //     first_name: dto.first_name,
+      //     last_name: dto.last_name,
+      //     phone: dto.phone,
+      //     profile: {
+      //       create: {},
+      //     },
+      //   },
+      // });
 
       // return user
       delete user.hash;
@@ -66,10 +75,8 @@ export class AuthService {
     } catch (error) {
       console.log(error);
       // if exist email throw error
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
-        }
+      if (error.code === 'P2002') {
+        throw new ForbiddenException('Credentials taken');
       }
     }
   }
@@ -84,22 +91,30 @@ export class AuthService {
       // if the user does not exist throw error
       if (find_user) return ResponseError('Credentials taken', HttpStatus.FORBIDDEN);
       // object new user
-      const user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          hash,
-          first_name: dto.first_name,
-          last_name: dto.last_name,
-          phone: dto.phone,
-          role: 'EXPERT',
-          profile: {
-            create: {},
-          },
-          expert: {
-            create: {},
-          },
-        },
+      const user = await this.userModel.create({
+        email: dto.email,
+        hash,
+        firstName: dto.first_name,
+        lastName: dto.last_name,
+        phone: dto.phone,
+        role: Role.TECHNICIAN,
       });
+      // const user = await this.prisma.user.create({
+      //   data: {
+      //     email: dto.email,
+      //     hash,
+      //     first_name: dto.first_name,
+      //     last_name: dto.last_name,
+      //     phone: dto.phone,
+      //     role: 'EXPERT',
+      //     profile: {
+      //       create: {},
+      //     },
+      //     expert: {
+      //       create: {},
+      //     },
+      //   },
+      // });
       // return user
       delete user.hash;
 
@@ -107,11 +122,8 @@ export class AuthService {
     } catch (error) {
       console.log(error);
       // if exist email throw error
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          console.log('hola');
-          return ResponseError('Credentials taken', HttpStatus.FORBIDDEN);
-        }
+      if (error.code === 'P2002') {
+        return ResponseError('Credentials taken', HttpStatus.FORBIDDEN);
       }
     }
   }
@@ -162,18 +174,28 @@ export class AuthService {
       return this.signToken(userAuth.id, userAuth.email, true);
     } else {
       // else create new user without password
-      const user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          hash: '',
-          first_name: dto.firstName,
-          last_name: dto.lastName,
-          phone: 0,
-          profile: {
-            create: {},
-          },
+      const user = await this.userModel.create({
+        email: dto.email,
+        hash: '',
+        first_name: dto.firstName,
+        last_name: dto.lastName,
+        phone: 0,
+        profile: {
+          create: {},
         },
       });
+      // const user = await this.prisma.user.create({
+      //   data: {
+      //     email: dto.email,
+      //     hash: '',
+      //     first_name: dto.firstName,
+      //     last_name: dto.lastName,
+      //     phone: 0,
+      //     profile: {
+      //       create: {},
+      //     },
+      //   },
+      // });
 
       return this.signToken(user.id, user.email, true);
     }
@@ -182,11 +204,13 @@ export class AuthService {
   // function to find a unique user
   async findUser(email: string) {
     // find the user by email
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
+    const user = await this.userModel.findOne({ email });
+
+    // const user = await this.prisma.user.findUnique({
+    //   where: {
+    //     email: email,
+    //   },
+    // });
     return user;
   }
 }
