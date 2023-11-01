@@ -19,6 +19,7 @@ import { Service } from '../generics/models/service.model';
 import { Portfolio } from '../generics/models/portfolio.model';
 import FormData from 'form-data';
 import axios from 'axios';
+import { DTOLocation } from './dto/location.dto';
 
 @Injectable()
 export class ProfileService {
@@ -37,6 +38,26 @@ export class ProfileService {
         profileInfo: {
           title: dto.title,
           description: dto.description,
+        },
+      });
+
+      return ResponseOK('updated successfully');
+    } catch (error) {
+      console.log(error);
+      ResponseError(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  // Location
+  async updateLocation(id: string, dto: DTOLocation) {
+    try {
+      await this.userModel.findByIdAndUpdate(id, {
+        location: {
+          name: dto.name,
+          geoLocation: {
+            type: 'Point',
+            coordinates: [dto.lat, dto.lng],
+          },
         },
       });
 

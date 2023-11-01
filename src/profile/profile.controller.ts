@@ -24,6 +24,7 @@ import { DTOSkill } from './dto/skill.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from '../user/decorators';
 import { User } from '../user/user.model';
+import { DTOLocation } from './dto/location.dto';
 
 @UseGuards(JwtGuard)
 @Controller('api/v1/profile')
@@ -33,6 +34,11 @@ export class ProfileController {
   @Patch('personal-info')
   async updatePersonalInfo(@GetUser() user: User, @Body() dto: DTOPersonalInfo) {
     return this.profileService.updatePersonalInfo(user._id, dto);
+  }
+
+  @Patch('location')
+  async updateLocation(@GetUser() user: User, @Body() dto: DTOLocation) {
+    return this.profileService.updateLocation(user._id, dto);
   }
 
   // NOTE: Status

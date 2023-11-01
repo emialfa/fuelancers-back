@@ -40,6 +40,34 @@ export class User extends Document {
     description: string;
   };
 
+  @Prop({
+    type: {
+      name: String,
+      geoLocation: {
+        type: {
+          type: String,
+          enum: ['Point'],
+          default: 'Point',
+        },
+        coordinates: {
+          type: [Number],
+          default: [0, 0],
+        },
+      },
+    },
+    default: {
+      name: 'Madrid, Spain',
+      geoLocation: { type: 'Point', coordinates: [40.4167754, -3.7037902] },
+    },
+  })
+  location: {
+    name: string;
+    geoLocation: {
+      type: string;
+      coordinates: number[];
+    };
+  };
+
   @Prop([{ user: { type: MongooseSchema.Types.ObjectId, ref: 'User' }, createdAt: Date }])
   contacts: { user: any; createdAt: Date }[];
 
@@ -68,9 +96,6 @@ export class User extends Document {
 
   @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Degree' }])
   degrees: any[];
-
-  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Location' }])
-  locations: any[];
 
   @Prop([{ skill: { type: MongooseSchema.Types.ObjectId, ref: 'Skill' }, createdAt: Date }])
   skills: { skill: any; createdAt: Date }[];
@@ -102,3 +127,5 @@ export class User extends Document {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ 'location.geoLocation': '2dsphere' });

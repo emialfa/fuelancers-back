@@ -11,7 +11,7 @@ import { Model } from 'mongoose';
 import { Degree } from './models/degree.model';
 import { Experience } from './models/experience.mode';
 import { Language } from './models/language.model';
-import { Location } from './models/location.model';
+// import { Location } from './models/location.model';
 import { Portfolio } from './models/portfolio.model';
 import { ProficiencyLanguage } from './models/proficiencyLanguage.model';
 import { Service } from './models/service.model';
@@ -26,7 +26,7 @@ export class GenericsService {
     @InjectModel(Degree.name) private readonly degreeModel: Model<Degree>,
     @InjectModel(Experience.name) private readonly experienceModel: Model<Experience>,
     @InjectModel(Language.name) private readonly languageModel: Model<Language>,
-    @InjectModel(Location.name) private readonly locationModel: Model<Location>,
+    // @InjectModel(Location.name) private readonly locationModel: Model<Location>,
     @InjectModel(Portfolio.name) private readonly portfolioModel: Model<Portfolio>,
     @InjectModel(ProficiencyLanguage.name)
     private readonly proficiencyLanguageModel: Model<ProficiencyLanguage>,

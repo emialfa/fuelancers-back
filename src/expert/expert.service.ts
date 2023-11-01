@@ -19,38 +19,71 @@ export class ExpertService {
     private config: ConfigService,
   ) {}
 
-  // services
   async getListExperts(querys: any) {
-    let parseQueryLanguage: number[] = [];
-
-    if (querys.language_id) {
-      parseQueryLanguage = querys.language_id.split('-');
-    }
-
     try {
-      const experts = await this.userModel
-        .find({
-          role: Role.TECHNICIAN,
-          ...(parseQueryLanguage?.length
-            ? { languages: { $elemMatch: { language: { $in: parseQueryLanguage } } } }
-            : {}),
-          ...(querys?.experience_id?.length
-            ? { 'experience.experience': querys.experience_id }
-            : {}),
-          ...(querys?.work_mode_id?.length ? { 'workmode.workmode': querys.work_mode_id } : {}),
-        })
-        .populate([
-          'status.status',
-          'languages.language',
-          'languages.proficiency',
-          'experience.experience',
-          'workmode.workmode',
+      const matchQuery = {
+        role: Role.TECHNICIAN,
+        ...(querys.language_id
+          ? { languages: { $elemMatch: { language: { $in: querys.language_id.split('-') } } } }
+          : {}),
+        ...(querys?.experience_id ? { 'experience.experience': querys.experience_id } : {}),
+        ...(querys?.work_mode_id
+          ? { 'workmode.workmode': { $in: querys.work_mode_id.split('-') } }
+          : {}),
+      };
+
+      let expertsToSend;
+
+      if (querys.lng) {
+        const expertsWithoutPopulation = await this.userModel.aggregate([
+          {
+            $geoNear: {
+              near: {
+                type: 'Point',
+                coordinates: [Number(querys.lng), Number(querys.lat)],
+              },
+              distanceField: 'distance',
+              spherical: true,
+            },
+          },
+          {
+            $sort: {
+              distance: 1,
+            },
+          },
         ]);
 
-      return ResponseGet(experts);
+        const expertIds = expertsWithoutPopulation.map((expert) => expert._id);
+
+        const experts = await this.userModel
+          .find({ ...matchQuery, _id: { $in: expertIds } })
+          .populate([
+            'status.status',
+            'languages.language',
+            'languages.proficiency',
+            'experience.experience',
+            'workmode.workmode',
+          ]);
+
+        expertsToSend = expertsWithoutPopulation.flatMap(
+          (expert) => experts.find((exp) => exp._id.toString() === expert._id.toString()) || [],
+        );
+      } else {
+        expertsToSend = await this.userModel
+          .find(matchQuery)
+          .populate([
+            'status.status',
+            'languages.language',
+            'languages.proficiency',
+            'experience.experience',
+            'workmode.workmode',
+          ]);
+      }
+
+      return ResponseGet(expertsToSend);
     } catch (error) {
       console.log(error);
-      ResponseError(error, HttpStatus.FORBIDDEN);
+      return ResponseError(error, HttpStatus.FORBIDDEN);
     }
   }
 
