@@ -56,7 +56,7 @@ export class ProfileService {
           name: dto.name,
           geoLocation: {
             type: 'Point',
-            coordinates: [dto.lat, dto.lng],
+            coordinates: [dto.lng, dto.lat],
           },
         },
       });
