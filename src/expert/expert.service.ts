@@ -47,6 +47,11 @@ export class ExpertService {
             },
           },
           {
+            $match: {
+              distance: { $lte: Number(querys.dist && querys.dist > 0 ? querys.dist : 10) * 1000 },
+            },
+          },
+          {
             $sort: {
               distance: 1,
             },
