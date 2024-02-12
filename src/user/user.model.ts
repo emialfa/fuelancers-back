@@ -97,8 +97,8 @@ export class User extends Document {
   @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Degree' }])
   degrees: any[];
 
-  @Prop([{ skill: { type: MongooseSchema.Types.ObjectId, ref: 'Skill' }, createdAt: Date }])
-  skills: { skill: any; createdAt: Date }[];
+  @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Skill' }])
+  skills: string[];
 
   @Prop([{ type: MongooseSchema.Types.ObjectId, ref: 'Service' }])
   services: any[];

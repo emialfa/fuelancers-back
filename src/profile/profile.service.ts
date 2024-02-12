@@ -291,9 +291,7 @@ export class ProfileService {
   async updateSkills(dto: DTOSkill) {
     try {
       await this.userModel.findByIdAndUpdate(dto.id_exp, {
-        skills: {
-          $push: { skill: dto.id_skill, createdAt: Date.now() },
-        },
+        skills: dto.id_skills,
       });
 
       return ResponseOK('Skill successfully created');

@@ -1,9 +1,9 @@
-import { IsString } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 
 export class DTOSkill {
   @IsString()
   id_exp: string;
 
-  @IsString()
-  id_skill: string;
+  @IsArray()
+  id_skills: string[];
 }

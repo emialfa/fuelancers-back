@@ -30,6 +30,7 @@ export class ExpertService {
         ...(querys?.work_mode_id
           ? { 'workmode.workmode': { $in: querys.work_mode_id.split('-') } }
           : {}),
+        ...(querys?.skill_id ? { skills: { $in: querys.skill_id.split('-') } } : {}),
       };
 
       let expertsToSend;
@@ -106,6 +107,7 @@ export class ExpertService {
           'experience.experience',
           'workmode.workmode',
           'portfolios.portfolio',
+          'skills',
         ]);
 
       if (!expert)
