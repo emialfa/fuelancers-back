@@ -260,11 +260,8 @@ export class ProfileService {
 
   async updateExperience(dto: DTOExperience) {
     try {
-      console.log(dto);
       await this.userModel.findByIdAndUpdate(dto.id_exp, {
-        experience: {
-          experience: dto.id_experience,
-        },
+        experience: dto.years,
       });
       return ResponseOK('Updated successfully');
     } catch (error) {

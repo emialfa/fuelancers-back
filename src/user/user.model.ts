@@ -78,12 +78,19 @@ export class User extends Document {
   categories: { category: any; createdAt: Date }[];
 
   @Prop({
-    type: {
-      experience: { type: MongooseSchema.Types.ObjectId, ref: 'Experience' },
-      createdAt: Date,
-    },
+    type: Number,
+    required: true,
+    default: 0,
   })
-  experience: { experience: any; createdAt: Date };
+  experience: number;
+
+  // @Prop({
+  //   type: {
+  //     experience: { type: MongooseSchema.Types.ObjectId, ref: 'Experience' },
+  //     createdAt: Date,
+  //   },
+  // })
+  // experience: { experience: any; createdAt: Date };
 
   @Prop([
     {

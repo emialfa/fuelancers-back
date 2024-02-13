@@ -26,7 +26,7 @@ export class ExpertService {
         ...(querys.language_id
           ? { languages: { $elemMatch: { language: { $in: querys.language_id.split('-') } } } }
           : {}),
-        ...(querys?.experience_id ? { 'experience.experience': querys.experience_id } : {}),
+        ...(querys?.experience ? { experience: { $gt: querys.experience } } : {}),
         ...(querys?.work_mode_id
           ? { 'workmode.workmode': { $in: querys.work_mode_id.split('-') } }
           : {}),
@@ -67,23 +67,23 @@ export class ExpertService {
             'status.status',
             'languages.language',
             'languages.proficiency',
-            'experience.experience',
+            // 'experience.experience',
             'workmode.workmode',
+            'skills',
           ]);
 
         expertsToSend = expertsWithoutPopulation.flatMap(
           (expert) => experts.find((exp) => exp._id.toString() === expert._id.toString()) || [],
         );
       } else {
-        expertsToSend = await this.userModel
-          .find(matchQuery)
-          .populate([
-            'status.status',
-            'languages.language',
-            'languages.proficiency',
-            'experience.experience',
-            'workmode.workmode',
-          ]);
+        expertsToSend = await this.userModel.find(matchQuery).populate([
+          'status.status',
+          'languages.language',
+          'languages.proficiency',
+          // 'experience.experience',
+          'workmode.workmode',
+          'skills',
+        ]);
       }
 
       return ResponseGet(expertsToSend);
@@ -96,19 +96,17 @@ export class ExpertService {
   // services
   async getExpertById(id: string) {
     try {
-      const expert = await this.userModel
-        .findById(id)
-        .populate([
-          'services',
-          'degrees',
-          'status.status',
-          'languages.language',
-          'languages.proficiency',
-          'experience.experience',
-          'workmode.workmode',
-          'portfolios.portfolio',
-          'skills',
-        ]);
+      const expert = await this.userModel.findById(id).populate([
+        'services',
+        'degrees',
+        'status.status',
+        'languages.language',
+        'languages.proficiency',
+        // 'experience.experience',
+        'workmode.workmode',
+        'portfolios.portfolio',
+        'skills',
+      ]);
 
       if (!expert)
         return ResponseError("The expert's profile has not been found", HttpStatus.FORBIDDEN);
