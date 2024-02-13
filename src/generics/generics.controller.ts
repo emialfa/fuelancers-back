@@ -1,4 +1,4 @@
-import { Body, Get, Post } from '@nestjs/common';
+import { Body, Delete, Get, Param, Post } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { GenericsService } from './generics.service';
 import { ListDTO } from './dto/list.dto';
@@ -47,19 +47,24 @@ export class GenericsController {
     return this.genericsService.getWorkMode();
   }
 
-  @Post('experience')
-  async createExperience(@Body() dto: ListDTO) {
-    return this.genericsService.createExperience(dto);
-  }
+  // @Post('experience')
+  // async createExperience(@Body() dto: ListDTO) {
+  //   return this.genericsService.createExperience(dto);
+  // }
 
-  @Get('experience')
-  async getExperience() {
-    return this.genericsService.getExperience();
-  }
+  // @Get('experience')
+  // async getExperience() {
+  //   return this.genericsService.getExperience();
+  // }
 
   @Post('skill')
   async createSkill(@Body() dto: ListDTO) {
     return this.genericsService.createSkill(dto);
+  }
+
+  @Delete('skill/:id')
+  async deleteSkill(@Param('id') id: string) {
+    return this.genericsService.deleteSkill(id);
   }
 
   @Get('skill')

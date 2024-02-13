@@ -160,6 +160,15 @@ export class GenericsService {
     }
   }
 
+  async deleteSkill(id: string) {
+    try {
+      await this.skillModel.findByIdAndDelete(id);
+      return ResponseOK('deleted successfully');
+    } catch (error) {
+      return ResponseError(error);
+    }
+  }
+
   async getSkills() {
     try {
       const skillList = await this.skillModel.find();
